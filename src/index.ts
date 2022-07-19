@@ -41,7 +41,7 @@ connectMongo()
 // that together define the "shape" of queries that are executed against
 // your data.
 const typeDefs = loadSchemaSync(join(__dirname, 'schema.graphql'), {
-  loaders: [new GraphQLFileLoader()]
+  loaders: [new GraphQLFileLoader()],
 });
 
 async function startApolloServer() {
@@ -59,7 +59,7 @@ async function startApolloServer() {
       resolverPair,
       resolverSummaries,
       resolverTickers,
-      resolverOrders
+      resolverOrders,
     ]),
     // context: accountsGraphQL.context,
     dataSources: () => ({
@@ -67,20 +67,20 @@ async function startApolloServer() {
       metadataAPI: new MetadataAPI(),
       namesAPI: new NamesAPI(),
       mybitxAPI: new MybitxAPI(),
-      ordersAPI: new OrdersAPI(OrderModel)
+      ordersAPI: new OrdersAPI(OrderModel),
     }),
     cache: new RedisCache(
       process.env.REDIS_URL || {
         // https://github.com/luin/ioredis
         host: '127.0.0.1',
-        port: 6379
+        port: 6379,
       }
     ),
     csrfPrevention: true,
     plugins: [
       responseCachePlugin(),
-      ApolloServerPluginDrainHttpServer({ httpServer })
-    ]
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+    ],
   });
 
   await server.start();
@@ -88,7 +88,7 @@ async function startApolloServer() {
   server.applyMiddleware({ app });
 
   await new Promise<void>((resolve) =>
-    httpServer.listen({ port: 4000 }, resolve)
+    httpServer.listen({ port: process.env.port || 4000 }, resolve)
   );
 
   // Start crons
