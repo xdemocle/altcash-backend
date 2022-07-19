@@ -88,7 +88,7 @@ async function startApolloServer() {
   server.applyMiddleware({ app });
 
   await new Promise<void>((resolve) =>
-    httpServer.listen({ port: process.env.port || 4000 }, resolve)
+    httpServer.listen({ port: process.env.PORT || 4000 }, resolve)
   );
 
   // Start crons
