@@ -20,10 +20,10 @@ class MetadataAPI extends RESTDataSource {
     const response = await this.get(
       `cryptocurrency/info?symbol=${symbol.toLowerCase()}`
     );
-    return (
-      response.data[symbol.toUpperCase()] &&
-      response.data[symbol.toUpperCase()][0]
-    );
+
+    return response.data[symbol.toUpperCase()]
+      ? response.data[symbol.toUpperCase()][0]
+      : { id: '0' };
   }
 
   async missingData(): Promise<Metadata[]> {
@@ -41,7 +41,7 @@ class MetadataAPI extends RESTDataSource {
         name: value.name,
         slug: value.slug,
         description: value.description,
-        logo: value.logo
+        logo: value.logo,
       });
     });
 

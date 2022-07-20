@@ -7,14 +7,11 @@ const queryMetaCoin = async (
 ): Promise<Metadata> => {
   const idUppercase = id.toUpperCase();
   const idLowerCase = id.toLowerCase();
-  const response: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [key: string]: any;
-  } = await dataSources.metadataAPI.getCoin(idLowerCase);
+  const response: Metadata = await dataSources.metadataAPI.getCoin(idLowerCase);
 
-  const coin = response[idUppercase][0];
+  const coin = response;
 
-  coin.metadataId = coin.id;
+  coin.metadataId = Number(coin.id);
   coin.id = idUppercase;
 
   return coin;
@@ -45,8 +42,8 @@ const resolvers = {
   Query: {
     metaCoin: queryMetaCoin,
     metaCoinAll: queryMetaAllCoins,
-    metaExperiment: queryMetaExperiment
-  }
+    metaExperiment: queryMetaExperiment,
+  },
 };
 
 export default resolvers;
