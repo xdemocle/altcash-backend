@@ -1,10 +1,10 @@
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
 import { loadSchemaSync } from '@graphql-tools/load';
 import { mergeTypeDefs, mergeResolvers } from '@graphql-tools/merge';
-import { RedisCache } from 'apollo-server-cache-redis';
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import responseCachePlugin from 'apollo-server-plugin-response-cache';
+import { InMemoryLRUCache } from '@apollo/utils.keyvaluecache';
 import express from 'express';
 import http from 'http';
 import mongoose from 'mongoose';
@@ -69,13 +69,8 @@ async function startApolloServer() {
       mybitxAPI: new MybitxAPI(),
       ordersAPI: new OrdersAPI(OrderModel),
     }),
-    cache: new RedisCache(
-      process.env.REDIS_URL || {
-        // https://github.com/luin/ioredis
-        host: '127.0.0.1',
-        port: 6379,
-      }
-    ),
+    // cache: new KeyvAdapter(new Keyv('redis://localhost:6379')),
+    cache: new InMemoryLRUCache({ max: 500 }),
     csrfPrevention: true,
     plugins: [
       responseCachePlugin(),
