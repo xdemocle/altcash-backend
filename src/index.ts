@@ -1,10 +1,12 @@
+import { BaseRedisCache } from 'apollo-server-cache-redis';
+import Redis from 'ioredis';
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
 import { loadSchemaSync } from '@graphql-tools/load';
 import { mergeTypeDefs, mergeResolvers } from '@graphql-tools/merge';
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import responseCachePlugin from 'apollo-server-plugin-response-cache';
-import { InMemoryLRUCache } from '@apollo/utils.keyvaluecache';
+// import { InMemoryLRUCache } from '@apollo/utils.keyvaluecache';
 import express from 'express';
 import http from 'http';
 import mongoose from 'mongoose';
@@ -69,8 +71,18 @@ async function startApolloServer() {
       mybitxAPI: new MybitxAPI(),
       ordersAPI: new OrdersAPI(OrderModel),
     }),
-    // cache: new KeyvAdapter(new Keyv('redis://localhost:6379')),
-    cache: new InMemoryLRUCache({ max: 500 }),
+    cache: new BaseRedisCache({
+      client: new Redis({
+        host: process.env.REDIS_URL || '127.0.0.1',
+      }),
+    }),
+    // cache: new InMemoryLRUCache({
+    //   max: 500,
+    //   // ~100MiB
+    //   maxSize: Math.pow(2, 20) * 100,
+    //   // 5 minutes (in milliseconds)
+    //   ttl: 300_000,
+    // }),
     csrfPrevention: true,
     plugins: [
       responseCachePlugin(),
