@@ -73,7 +73,7 @@ async function startApolloServer() {
     }),
     cache: new BaseRedisCache({
       client: new Redis({
-        host: process.env.HEROKU_REDIS_CHARCOAL_URL || '127.0.0.1',
+        host: process.env.REDIS_URL || '127.0.0.1',
       }),
     }),
     // cache: new InMemoryLRUCache({
