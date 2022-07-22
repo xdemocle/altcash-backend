@@ -72,9 +72,18 @@ async function startApolloServer() {
       ordersAPI: new OrdersAPI(OrderModel),
     }),
     cache: new BaseRedisCache({
-      client: new Redis({
-        host: process.env.HEROKU_REDIS_CHARCOAL_TLS_URL || '127.0.0.1',
-      }),
+      client: new Redis(
+        process.env.HEROKU_REDIS_CHARCOAL_TLS_URL || '127.0.0.1',
+        {
+          tls: {
+            rejectUnauthorized: false,
+          },
+        }
+        // socket: {
+        //   tls: process.env.HEROKU_REDIS_CHARCOAL_TLS_URL ? true : false,
+        //   rejectUnauthorized: false,
+        // },
+      ),
     }),
     // cache: new InMemoryLRUCache({
     //   max: 500,
