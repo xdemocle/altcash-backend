@@ -46,6 +46,16 @@ const typeDefs = loadSchemaSync(join(__dirname, 'schema.graphql'), {
   loaders: [new GraphQLFileLoader()],
 });
 
+let redisOptions = {};
+
+if (process.env.NODE_ENV === 'production') {
+  redisOptions = {
+    tls: {
+      rejectUnauthorized: false,
+    },
+  };
+}
+
 async function startApolloServer() {
   const app = express();
   const httpServer = http.createServer(app);
@@ -74,15 +84,7 @@ async function startApolloServer() {
     cache: new BaseRedisCache({
       client: new Redis(
         process.env.HEROKU_REDIS_CHARCOAL_TLS_URL || '127.0.0.1',
-        {
-          tls: {
-            rejectUnauthorized: false,
-          },
-        }
-        // socket: {
-        //   tls: process.env.HEROKU_REDIS_CHARCOAL_TLS_URL ? true : false,
-        //   rejectUnauthorized: false,
-        // },
+        redisOptions
       ),
     }),
     // cache: new InMemoryLRUCache({
