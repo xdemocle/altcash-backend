@@ -17,7 +17,7 @@ class BinanceAPI extends RESTDataSource {
     this.baseURL = BINANCE_API_URL + '/api/v3/';
 
     this.client = new (Spot as any)(BINANCE_API_KEY, BINANCE_API_SECRET, {
-      baseURL: BINANCE_API_URL,
+      baseURL: 'https://testnet.binance.vision',
     });
 
     // setTimeout(async () => {
@@ -35,6 +35,8 @@ class BinanceAPI extends RESTDataSource {
   async getAllMarkets(): Promise<Record<string, string>> {
     const response = await this.get('exchangeInfo');
     let symbols = response.symbols;
+
+    console.log(symbols.length)
 
     // Removing not needed ma.'rkets
     symbols = filter(symbols, (market) => {
