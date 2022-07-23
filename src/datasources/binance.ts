@@ -1,12 +1,35 @@
 import { RESTDataSource } from 'apollo-datasource-rest';
 import { each, filter } from 'lodash';
+import { Spot } from '@binance/connector';
+import {
+  BINANCE_API_KEY,
+  BINANCE_API_SECRET,
+  BINANCE_API_URL,
+} from '../config';
 import { Order } from '../types';
 
 class BinanceAPI extends RESTDataSource {
+  client: any;
+
   constructor() {
     super();
 
-    this.baseURL = 'https://api.binance.com/api/v3/';
+    this.baseURL = BINANCE_API_URL + '/api/v3/';
+
+    this.client = new (Spot as any)(BINANCE_API_KEY, BINANCE_API_SECRET, {
+      baseURL: BINANCE_API_URL,
+    });
+
+    // setTimeout(async () => {
+    //   const data = await this.getAccountData();
+    //   console.debug('getAccountData', data);
+    // }, 5000);
+  }
+
+  async getAccountData(): Promise<Record<string, string>> {
+    const response = await this.client.account();
+    // .then(response => client.logger.log(response.data))
+    return response.data;
   }
 
   async getAllMarkets(): Promise<Record<string, string>> {
@@ -74,7 +97,7 @@ class BinanceAPI extends RESTDataSource {
       limit: 'number (double)',
       timeInForce: 'string',
       clientOrderId: 'string (uuid)',
-      useAwards: 'boolean'
+      useAwards: 'boolean',
     };
 
     // return await this.post('orders', exchangeOrder);

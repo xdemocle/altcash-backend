@@ -1,12 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import sgMail from '@sendgrid/mail';
-import dotenv from 'dotenv';
+import { SENDGRID_API_KEY } from '../config';
 
 require('isomorphic-fetch');
 
-dotenv.config();
-
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+sgMail.setApiKey(SENDGRID_API_KEY);
 
 class Sendgrid {
   sender = sgMail;
@@ -24,7 +22,7 @@ class Sendgrid {
       from: 'hello@altcash.co.za', // Change to your verified sender
       subject: subject,
       text: message,
-      html: `<h3>New Message!</h3><br /><div>${message}</div>`
+      html: `<h3>New Message!</h3><br /><div>${message}</div>`,
     };
 
     return this.sender.send(msg);

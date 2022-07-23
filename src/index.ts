@@ -27,6 +27,7 @@ import resolverOrders from './resolvers/resolver-orders';
 import resolverPair from './resolvers/resolver-pair';
 import resolverSummaries from './resolvers/resolver-summaries';
 import resolverTickers from './resolvers/resolver-tickers';
+import { REDIS_OPTIONS } from './config';
 
 // We connect mongoose to our local mongodb database
 const connectMongo = async () => {
@@ -45,16 +46,6 @@ connectMongo()
 const typeDefs = loadSchemaSync(join(__dirname, 'schema.graphql'), {
   loaders: [new GraphQLFileLoader()],
 });
-
-let redisOptions = {};
-
-if (process.env.NODE_ENV === 'production') {
-  redisOptions = {
-    tls: {
-      rejectUnauthorized: false,
-    },
-  };
-}
 
 async function startApolloServer() {
   const app = express();
@@ -84,7 +75,7 @@ async function startApolloServer() {
     cache: new BaseRedisCache({
       client: new Redis(
         process.env.HEROKU_REDIS_CHARCOAL_TLS_URL || '127.0.0.1',
-        redisOptions
+        REDIS_OPTIONS
       ),
     }),
     // cache: new InMemoryLRUCache({
