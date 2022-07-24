@@ -85,6 +85,7 @@ type Order {
   isCancelled: Boolean
   wallet: String
   reference: String
+  orderReferences: [String]
   timestamp: String
 }
 
@@ -100,6 +101,21 @@ input OrderInput {
   isCancelled: Boolean
   wallet: String
   reference: String
+  orderReferences: [String]
+}
+
+type OrderQueue {
+  orderId: String
+  isExecuted: Boolean
+  isFilled: Boolean
+  timestamp: String
+}
+
+input OrderQueueInput {
+  orderId: String
+  isExecuted: Boolean
+  isFilled: Boolean
+  timestamp: String
 }
 
 # The "Query" type is special: it lists all of the available queries that
@@ -118,9 +134,19 @@ type Query {
   pair(pair: String): Pair!
   getOrders: [Order!]
   getOrder(id: String): Order
+  getQueues: [OrderQueue!]
+  getQueue(id: String): OrderQueue
+  importAndCheckOrders: [OrderQueue]
+  checkPendingPaidOrders: [Order]
 }
 
 type Mutation {
   createOrder(amount: String, total: String, symbol: String): Order!
   updateOrder(id: String, input: OrderInput): Order!
+  createQueueOrder(
+    orderId: String
+    isExecuted: Boolean
+    isFilled: Boolean
+  ): OrderQueue!
+  updateQueueOrder(id: String, input: OrderQueueInput): OrderQueue!
 }

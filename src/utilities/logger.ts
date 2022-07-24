@@ -1,30 +1,41 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, no-console */
+import { NODE_ENV } from '../config';
 import Sendgrid from './sendgrid';
 
 class Logger {
   sender = new Sendgrid();
 
-  error(error: any) {
-    const subject = 'Logger - error';
-
-    this.request(error, subject);
-
-    console.debug(`${subject}:`, error);
+  get timestamp() {
+    return new Date().toISOString();
   }
 
-  info(info: any) {
-    console.info('Logger - info: ', info);
+  error(error: any, ...args: string[]) {
+    const subject = 'Logger - error: ';
+
+    if (NODE_ENV !== 'development') {
+      this.sendError(JSON.stringify(error), subject);
+    }
+
+    console.error(`[${this.timestamp}]`, subject, Error(error), ...args);
   }
 
-  request(message: any, subject: string) {
+  info(info: any, ...args: string[]) {
+    console.info(`[${this.timestamp}]`, 'Logger - info: ', info, ...args);
+  }
+
+  debug(debug: any, ...args: string[]) {
+    console.debug(`[${this.timestamp}]`, 'Logger - debug: ', debug, ...args);
+  }
+
+  sendError(message: string, subject: string) {
     const request = this.sender.post(message, subject);
 
     request
       .then((response) => {
-        console.log('Logger - request response: ', JSON.stringify(response));
+        this.info('Logger - sendError response: ', JSON.stringify(response));
       })
       .catch((err: any) => {
-        console.log('Logger - request error: ', err);
+        this.error('Logger - sendError error: ', err);
       });
 
     return request;

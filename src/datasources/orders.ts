@@ -41,7 +41,8 @@ class OrdersAPI extends MongoDataSource<Order> {
       isWithdrawn: false,
       isCancelled: false,
       wallet: '',
-      reference: ''
+      reference: '',
+      orderReferences: [] as string[],
     };
 
     return await this.model.create(newOrder);
@@ -78,6 +79,12 @@ class OrdersAPI extends MongoDataSource<Order> {
 
     if (input.reference) {
       updatedOrder.reference = input.reference;
+    }
+
+    if (input.orderReferences) {
+      const order = await this.getOrder(id);
+      const orderOrderReferences = order.orderReferences || []
+      updatedOrder.orderReferences = [...orderOrderReferences, ...input.orderReferences];
     }
 
     // Ifthere is something forreal to update

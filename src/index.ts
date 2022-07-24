@@ -1,29 +1,21 @@
 import express from 'express';
 import http from 'http';
-import cron from 'node-cron';
-import OrdersAPI from './datasources/orders';
-import OrdersQueueAPI from './datasources/orders-queue';
-import OrderModel from './models/orders';
-import OrderQueueModel from './models/orders-queue';
-import { instanceServer } from './utilities/apollo';
+import { runCron } from './utilities/cronlist';
 import { connectMongo } from './utilities/db';
+import { instanceServer } from './utilities/apollo';
+import { SERVER_HTTP_HOSTNAME, SERVER_HTTP_PORT } from './config';
 
 // We connect mongoose to our local mongodb database
 connectMongo()
   .then(() => {
     // Start crons
-    cron.schedule('*/5 * * * * *', async () => {
-      const ordersApi = new OrdersAPI(OrderModel);
-      const ordersQueueApi = new OrdersQueueAPI(OrderQueueModel);
+    runCron();
 
-      ordersQueueApi.importAndCheckOrders(
-        await ordersApi.checkPendingPaidOrders()
-      );
-    });
-
-    console.debug('🎉 connected to MongoDB database successfully')
+    console.debug('🎉 Connected to MongoDB database successfully');
   })
   .catch((error) => console.error(error));
+
+// export let httpServer: http.Server = null;
 
 // We start Apollo GraphQL Server
 async function startApolloServer() {
@@ -36,10 +28,10 @@ async function startApolloServer() {
   server.applyMiddleware({ app });
 
   await new Promise<void>((resolve) =>
-    httpServer.listen({ port: process.env.PORT || 4000 }, resolve)
+    httpServer.listen({ port: SERVER_HTTP_PORT }, resolve)
   );
 
-  console.debug(`🚀 Apollo ready at http://localhost:4000${server.graphqlPath}`);
+  console.debug(`🚀 Apollo ready at http://${SERVER_HTTP_HOSTNAME}:${SERVER_HTTP_PORT}${server.graphqlPath}`);
 }
 
 startApolloServer();

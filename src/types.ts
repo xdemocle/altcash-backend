@@ -85,6 +85,7 @@ export interface Order extends Document {
   isCancelled?: boolean;
   wallet?: string;
   reference: string;
+  orderReferences: string[];
   timestamp: string;
 }
 
@@ -100,6 +101,7 @@ export interface OrderParams {
   isCancelled?: boolean;
   wallet?: string;
   reference?: string;
+  orderReferences?: string[];
 }
 
 export interface UpdateOrderParams {
@@ -110,23 +112,24 @@ export interface UpdateOrderParams {
   isCancelled?: boolean;
   wallet?: string;
   reference?: string;
+  orderReferences?: string[];
 }
 
 export interface OrderQueue extends Document {
   orderId: string;
+  isExecuted: boolean;
+  isFilled: boolean;
   timestamp: string;
 }
 
 export interface OrderQueueParams {
   orderId: string;
-  transactionId?: string;
   isExecuted?: boolean;
   isFilled?: boolean;
 }
 
 export interface UpdateOrderQueueParams {
   orderId?: string;
-  transactionId?: string;
   isExecuted?: boolean;
   isFilled?: boolean;
 }
@@ -143,10 +146,48 @@ export declare abstract class DataSource {
   getOrder(id: string): Order;
   createOrder(amount: string, total: string, symbol: string): Order;
   updateOrder(id: string, input: OrderParams): Order;
+  createQueue(orderId: string, isExecuted: boolean, isFilled: boolean): OrderQueue;
+  updateQueue(id: string, input: UpdateOrderQueueParams): OrderQueue;
   getAll(): Metadata[];
   missingData(): Metadata[];
+  importAndCheckOrders(orders: Order[]): OrderQueue[];
+  checkPendingPaidOrders(): Order[];
 }
 
 export type DataSources = {
   [name: string]: DataSource;
 };
+
+export interface BinanceOrderResponse {
+  statusText: string;
+  data: {
+    // symbol: 'XRPBTC',
+    symbol: string;
+    // orderId: 196334,
+    orderId: number,
+    // orderListId: -1,
+    orderListId: number,
+    // clientOrderId: 'ZiYunMe8S7XEmq8AtcUk7N',
+    clientOrderId: string,
+    // transactTime: 1658591808732,
+    transactTime: number,
+    // price: '0.00000000',
+    price: string,
+    // origQty: '20.00000000',
+    origQty: string,
+    // executedQty: '0.00000000',
+    executedQty: string,
+    // cummulativeQuoteQty: '0.00000000',
+    cummulativeQuoteQty: string,
+    // status: 'EXPIRED',
+    status: string,
+    // timeInForce: 'GTC',
+    timeInForce: string,
+    // type: 'MARKET',
+    type: string,
+    // side: 'BUY',
+    side: string,
+    // fills: []
+    fills: string[]
+  }
+}

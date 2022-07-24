@@ -1,17 +1,14 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { MongoDataSource } from 'apollo-datasource-mongodb';
 import { ObjectId } from 'bson';
 import { isUndefined } from 'lodash';
-import OrderModel from '../models/orders';
 import {
   OrderQueueParams,
   OrderQueue,
   UpdateOrderQueueParams,
-  Order
+  Order,
+  BinanceOrderResponse
 } from '../types';
 import Logger from '../utilities/logger';
-import BinanceAPI from './binance';
-import OrdersAPI from './orders';
 
 class OrdersQueueAPI extends MongoDataSource<OrderQueue> {
   async getQueues(): Promise<OrderQueue[] | null> {
@@ -31,8 +28,6 @@ class OrdersQueueAPI extends MongoDataSource<OrderQueue> {
 
     response.timestamp = order._id.getTimestamp();
 
-    console.debug('getQueue', response);
-
     return response;
   }
 
@@ -51,14 +46,14 @@ class OrdersQueueAPI extends MongoDataSource<OrderQueue> {
     return await this.model.create(order);
   }
 
-  async updateQueue(id: string, input: UpdateOrderQueueParams) {
+  updateQueue = async (id: string, input: UpdateOrderQueueParams) => {
     this.deleteFromCacheById(id);
 
     const updatedQueueOrder = this.getUpdatedQueueOrder(input);
 
     // If there is something for real to update
     if (Object.keys(updatedQueueOrder).length > 0) {
-      await this.collection.updateOne(
+      return await this.collection.updateOne(
         {
           _id: new ObjectId(id)
         },
@@ -68,7 +63,7 @@ class OrdersQueueAPI extends MongoDataSource<OrderQueue> {
       );
     }
 
-    return await this.getQueue(id);
+    return {};
   }
 
   async updateQueueByOrderId(orderId: string, input: UpdateOrderQueueParams) {
@@ -91,38 +86,51 @@ class OrdersQueueAPI extends MongoDataSource<OrderQueue> {
     return null;
   }
 
-  async executeExchangeOrder(orderId: string) {
-    const ordersApi = new OrdersAPI(OrderModel);
-    const binanceApi = new BinanceAPI();
-    const order = await ordersApi.getOrder(orderId);
-
-    Logger.error('error');
+  async executeExchangeOrder(order: Order) {
+    const binanceApi = this.context.dataSources.marketsAPI;
 
     try {
-      const postOder = await binanceApi.postOrder(order);
+      const postBinanceOrder = await binanceApi.postOrder(order);
 
-      if (postOder) {
-        this.updateQueueByOrderId(orderId, { isExecuted: true });
-        Logger.info(postOder);
+      if (postBinanceOrder.statusText === 'OK') {
+        const isFilled = postBinanceOrder.data.status === 'FILLED';
+        const updatedOrderQueue = await this.updateQueueByOrderId(String(order._id), {
+          isExecuted: true,
+          isFilled
+        });
+
+        // Update order with binance api response
+        const updateOrder = await this.updateOrder(order, postBinanceOrder);
+
+        Logger.info(`executeExchangeOrder:\nupdateOrder: ${JSON.stringify(updateOrder)}\nupdatedOrderQueue ${JSON.stringify(updatedOrderQueue)}`);
       }
     } catch (error) {
-      Logger.error(error);
+      Logger.error(`executeExchangeOrder: ${JSON.stringify(error)}`);
     }
   }
 
+  async updateOrder(order: Order, exchangerOrder: BinanceOrderResponse) {
+    return await this.context.dataSources.ordersAPI.updateOrder(String(order._id), [JSON.stringify(exchangerOrder.data)]);
+  }
+
   async importAndCheckOrders(orders: Order[]) {
+    if (!orders || !orders.length) {
+      return [];
+    }
+
     const newOrdersQueue: OrderQueueParams[] = [];
     const queue = await this.getQueues();
 
     // Check if each order are already present
     orders.forEach(async (order) => {
-      const isPresent = queue.find((e) => e.orderId === order.id);
+      const isPresent = queue.find((e) => e.orderId === String(order._id));
 
       // TODO Check order to exchanger and update order isPending
-      // console.log('isPresent.isExecuted', isPresent);
+      // console.log('isPresent', isPresent)
 
       if (!isPresent) {
-        // TODO Execute order to exchanger
+        this.executeExchangeOrder(order);
+
         newOrdersQueue.push({
           orderId: order._id,
           isExecuted: false,
@@ -131,12 +139,9 @@ class OrdersQueueAPI extends MongoDataSource<OrderQueue> {
       }
     });
 
-    // In parallel we execute the orders
-    newOrdersQueue.forEach((queue) => {
-      this.executeExchangeOrder(queue.orderId);
-    });
-
-    console.debug('importOrders', JSON.stringify(newOrdersQueue));
+    if (newOrdersQueue.length) {
+      Logger.debug(`importAndCheckOrders: ${JSON.stringify(newOrdersQueue)}`);
+    }
 
     return this.model.insertMany(newOrdersQueue);
   }
@@ -146,10 +151,6 @@ class OrdersQueueAPI extends MongoDataSource<OrderQueue> {
 
     if (input.orderId) {
       updatedQueueOrder.orderId = input.orderId;
-    }
-
-    if (input.transactionId) {
-      updatedQueueOrder.transactionId = input.transactionId;
     }
 
     if (!isUndefined(input.isExecuted)) {

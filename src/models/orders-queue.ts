@@ -3,7 +3,6 @@ import { OrderQueue } from '../types';
 
 export const OrderQueueSchemaObject = {
   orderId: { type: String, required: true },
-  transactionId: { type: String },
   isExecuted: { type: Boolean },
   isFilled: { type: Boolean }
 };

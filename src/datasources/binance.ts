@@ -1,42 +1,48 @@
 import { RESTDataSource } from 'apollo-datasource-rest';
-import { each, filter } from 'lodash';
+import { each, filter, find } from 'lodash';
 import { Spot } from '@binance/connector';
 import {
   BINANCE_API_KEY,
+  BINANCE_API_KEY_TESTNET,
   BINANCE_API_SECRET,
+  BINANCE_API_SECRET_TESTNET,
   BINANCE_API_URL,
 } from '../config';
-import { Order } from '../types';
+import { BinanceOrderResponse, Order } from '../types';
+import Logger from '../utilities/logger';
+
+const ERROR = {
+  notrade: 'Your Binance Account can\'t trade!',
+  nofunds: 'Your Binance Account has not enough funds!',
+}
 
 class BinanceAPI extends RESTDataSource {
   client: any;
+  clientTestnet: any;
 
   constructor() {
     super();
 
     this.baseURL = BINANCE_API_URL + '/api/v3/';
 
-    this.client = new (Spot as any)(BINANCE_API_KEY, BINANCE_API_SECRET, {
+    this.client = new (Spot as any)(BINANCE_API_KEY, BINANCE_API_SECRET);
+
+    this.clientTestnet = new (Spot as any)(BINANCE_API_KEY_TESTNET, BINANCE_API_SECRET_TESTNET, {
       baseURL: 'https://testnet.binance.vision',
     });
-
-    // setTimeout(async () => {
-    //   const data = await this.getAccountData();
-    //   console.debug('getAccountData', data);
-    // }, 5000);
   }
 
-  async getAccountData(): Promise<Record<string, string>> {
-    const response = await this.client.account();
-    // .then(response => client.logger.log(response.data))
-    return response.data;
+  async ping(): Promise<Record<string, string>> {
+    return await this.get('ping');
+  }
+
+  async time(): Promise<Record<string, string>> {
+    return await this.get('time');
   }
 
   async getAllMarkets(): Promise<Record<string, string>> {
     const response = await this.get('exchangeInfo');
     let symbols = response.symbols;
-
-    console.log(symbols.length)
 
     // Removing not needed ma.'rkets
     symbols = filter(symbols, (market) => {
@@ -81,38 +87,49 @@ class BinanceAPI extends RESTDataSource {
     return await this.get(`ticker/24hr?symbol=${marketSymbol}`);
   }
 
-  async ping(): Promise<Record<string, string>> {
-    return await this.get('ping');
+  async getAccountData(): Promise<Record<string, string>> {
+    const response = await this.client.account();
+    // console.debug('getAccountData', response.data);
+    return response.data;
   }
 
-  async time(): Promise<Record<string, string>> {
-    return await this.get('time');
+  async postOrder(order: Order): Promise<BinanceOrderResponse> {
+    const accountData = await this.getAccountData();
+
+    if (!accountData.canTrade) {
+      Logger.error(`Binance.postOrder: ${ERROR.notrade}`);
+      throw new Error(`Binance.postOrder: ${ERROR.notrade}`);
+    }
+
+    const accountBalance = find(accountData.balances as any, { asset: 'BTC' });
+    // Logger.debug(`accountBalance: ${JSON.stringify(accountBalance)}`);
+
+    let apiResponse = null;
+
+    // Check if account has funds
+    if (Number(accountBalance.free) > 0.0006) {
+      // make the order
+      try {
+        apiResponse = await this.clientTestnet.newOrder('XRPBTC', 'BUY', 'MARKET', {
+          // price: '0.001',
+          // timeInForce: 'GTC'
+          quantity: 20,
+        });
+      } catch (error) {
+        let err = error;
+
+        if (error && error.response && error.response.data) {
+          err = error.response.data;
+        }
+
+        throw new Error(`Binance.postOrder: ${JSON.stringify(err)}`);
+      }
+    } else {
+      throw new Error(`Binance.postOrder: ${ERROR.nofunds} ${JSON.stringify(accountBalance)}`);
+    }
+
+    return apiResponse;
   }
-
-  async postOrder(order: Order): Promise<Record<string, string>> {
-    const exchangeOrder = {
-      marketSymbol: order.symbol,
-      direction: 'string',
-      type: 'string',
-      quantity: 'number (double)',
-      ceiling: 'number (double)',
-      limit: 'number (double)',
-      timeInForce: 'string',
-      clientOrderId: 'string (uuid)',
-      useAwards: 'boolean',
-    };
-
-    // return await this.post('orders', exchangeOrder);
-    return exchangeOrder;
-  }
-
-  // get baseURL() {
-  //   if (this.context.env === 'development') {
-  //     return 'https://movies-api-dev.example.com/'
-  //   } else {
-  //     return 'https://movies-api.example.com/'
-  //   }
-  // }
 }
 
 export default BinanceAPI;

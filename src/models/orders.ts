@@ -12,7 +12,8 @@ export const OrderSchemaObject = {
   isWithdrawn: { type: Boolean },
   isCancelled: { type: Boolean },
   wallet: { type: String },
-  reference: { type: String }
+  reference: { type: String },
+  orderReferences: { type: Array }
 };
 
 const OrderSchema: Schema = new Schema(OrderSchemaObject);

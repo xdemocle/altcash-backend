@@ -22,11 +22,14 @@ import resolverTickers from '../resolvers/resolver-tickers';
 import OrdersAPI from '../datasources/orders';
 import OrderModel from '../models/orders';
 import { REDIS_OPTIONS } from '../config';
+import OrdersQueueAPI from '../datasources/orders-queue';
+import OrderQueueModel from '../models/orders-queue';
+import resolverOrderQueues from '../resolvers/resolver-order-queues';
 
 // A schema is a collection of type definitions (hence "typeDefs")
 // that together define the "shape" of queries that are executed against
 // your data.
-const typeDefs = loadSchemaSync(join(__dirname, '../schema.graphql'), {
+export const typeDefs = loadSchemaSync(join(__dirname, '../schema.graphql'), {
   loaders: [new GraphQLFileLoader()],
 });
 
@@ -43,6 +46,7 @@ export const instanceServer = (httpServer: any) => {
       resolverSummaries,
       resolverTickers,
       resolverOrders,
+      resolverOrderQueues,
     ]),
     // context: accountsGraphQL.context,
     dataSources: () => ({
@@ -51,6 +55,7 @@ export const instanceServer = (httpServer: any) => {
       namesAPI: new NamesAPI(),
       mybitxAPI: new MybitxAPI(),
       ordersAPI: new OrdersAPI(OrderModel),
+      ordersQueueAPI: new OrdersQueueAPI(OrderQueueModel),
     }),
     cache: new BaseRedisCache({
       client: new Redis(
