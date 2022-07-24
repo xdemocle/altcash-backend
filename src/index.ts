@@ -3,7 +3,7 @@ import http from 'http';
 import { runCron } from './utilities/cronlist';
 import { connectMongo } from './utilities/db';
 import { instanceServer } from './utilities/apollo';
-import { SERVER_HTTP_HOSTNAME, SERVER_HTTP_PORT } from './config';
+import { SERVER_HTTP_PORT } from './config';
 
 // We connect mongoose to our local mongodb database
 connectMongo()
@@ -31,7 +31,7 @@ async function startApolloServer() {
     httpServer.listen({ port: SERVER_HTTP_PORT }, resolve)
   );
 
-  console.debug(`🚀 Apollo ready at http://${SERVER_HTTP_HOSTNAME}:${SERVER_HTTP_PORT}${server.graphqlPath}`);
+  console.debug(`🚀 Apollo ready at http://localhost:${SERVER_HTTP_PORT}${server.graphqlPath}`);
 }
 
 startApolloServer();

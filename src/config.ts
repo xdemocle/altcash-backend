@@ -1,11 +1,8 @@
 import dotenv from 'dotenv';
-import os from 'os';
 
 dotenv.config();
 
 export const NODE_ENV = process.env.NODE_ENV;
-
-export const SERVER_HTTP_HOSTNAME = os.hostname() || 'localhost';
 
 export const SERVER_HTTP_PORT = process.env.PORT || 4000;
 
