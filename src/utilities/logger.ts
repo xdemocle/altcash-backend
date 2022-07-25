@@ -56,7 +56,7 @@ class Logger {
 
     request
       .then((response) => {
-        this.info('Logger - sendInfo response: ', JSON.stringify(response));
+        this.log('Logger - sendInfo response: ', JSON.stringify(response));
       })
       .catch((err: any) => {
         this.error('Logger - sendInfo error: ', err);
