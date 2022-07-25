@@ -56,7 +56,7 @@ class OrdersAPI extends MongoDataSource<Order> {
 
     if (!isUndefined(input.isPaid)) {
       if (input.isPaid) {
-        logger.info(`Order id ${id} is paid.`);
+        logger.debug(`Order id ${id} is paid.`);
       }
 
       updatedOrder.isPaid = input.isPaid;

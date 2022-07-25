@@ -39,7 +39,7 @@ const resolvers = {
         symbol
       );
 
-      logger.sendInfo('createOrder', JSON.stringify(sendOrder));
+      logger.info('createOrder', JSON.stringify(sendOrder));
 
       return sendOrder;
     },
