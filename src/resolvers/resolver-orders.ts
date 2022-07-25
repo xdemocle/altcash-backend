@@ -1,4 +1,5 @@
 import { DataSources, OrderParams } from '../types';
+import logger from '../utilities/logger';
 
 // Resolvers define the technique for fetching the types defined in the
 // schema.
@@ -38,7 +39,7 @@ const resolvers = {
         symbol
       );
 
-      console.debug('createOrder', sendOrder);
+      logger.sendInfo('createOrder', JSON.stringify(sendOrder));
 
       return sendOrder;
     },

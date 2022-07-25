@@ -9,7 +9,7 @@ import {
   BINANCE_API_URL,
 } from '../config';
 import { BinanceOrderResponse, Order } from '../types';
-import Logger from '../utilities/logger';
+import logger from '../utilities/logger';
 
 const ERROR = {
   notrade: 'Your Binance Account can\'t trade!',
@@ -93,16 +93,16 @@ class BinanceAPI extends RESTDataSource {
     return response.data;
   }
 
-  async postOrder(order: Order): Promise<BinanceOrderResponse> {
+  async postOrder(order: Order): Promise<BinanceOrderResponse | Error> {
     const accountData = await this.getAccountData();
 
     if (!accountData.canTrade) {
-      Logger.error(`Binance.postOrder: ${ERROR.notrade}`);
-      throw new Error(`Binance.postOrder: ${ERROR.notrade}`);
+      logger.error(`Binance.postOrder: ${ERROR.notrade}`);
+      return new Error(`Binance.postOrder: ${ERROR.notrade}`);
     }
 
     const accountBalance = find(accountData.balances as any, { asset: 'BTC' });
-    // Logger.debug(`accountBalance: ${JSON.stringify(accountBalance)}`);
+    // logger.debug(`accountBalance: ${JSON.stringify(accountBalance)}`);
 
     let apiResponse = null;
 
@@ -110,11 +110,12 @@ class BinanceAPI extends RESTDataSource {
     if (Number(accountBalance.free) > 0.0006) {
       // make the order
       try {
-        apiResponse = await this.clientTestnet.newOrder('XRPBTC', 'BUY', 'MARKET', {
+        apiResponse = await this.clientTestnet.newOrder(`${order.symbol.toUpperCase()}BTC`, 'BUY', 'MARKET', {
           // price: '0.001',
           // timeInForce: 'GTC'
-          quantity: 20,
+          quantity: order.amount,
         });
+        logger.log('Binance postOrder', apiResponse)
       } catch (error) {
         let err = error;
 
@@ -122,10 +123,10 @@ class BinanceAPI extends RESTDataSource {
           err = error.response.data;
         }
 
-        throw new Error(`Binance.postOrder: ${JSON.stringify(err)}`);
+        return new Error(`Binance.postOrder: ${JSON.stringify(err)}`);
       }
     } else {
-      throw new Error(`Binance.postOrder: ${ERROR.nofunds} ${JSON.stringify(accountBalance)}`);
+      return new Error(`Binance.postOrder: ${ERROR.nofunds} ${JSON.stringify(accountBalance)}`);
     }
 
     return apiResponse;

@@ -9,6 +9,14 @@ class Logger {
     return new Date().toISOString();
   }
 
+  log(log: any, ...args: string[]) {
+    console.log(`[${this.timestamp}]`, 'Logger - log: ', log, ...args);
+  }
+
+  debug(debug: any, ...args: string[]) {
+    console.debug(`[${this.timestamp}]`, 'Logger - debug: ', debug, ...args);
+  }
+
   error(error: any, ...args: string[]) {
     const subject = 'Logger - error: ';
 
@@ -20,11 +28,13 @@ class Logger {
   }
 
   info(info: any, ...args: string[]) {
-    console.info(`[${this.timestamp}]`, 'Logger - info: ', info, ...args);
-  }
+    const subject = 'Logger - info: ';
 
-  debug(debug: any, ...args: string[]) {
-    console.debug(`[${this.timestamp}]`, 'Logger - debug: ', debug, ...args);
+    if (NODE_ENV !== 'development') {
+      this.sendInfo(JSON.stringify(info), subject);
+    }
+
+    console.info(`[${this.timestamp}]`, subject, info, ...args);
   }
 
   sendError(message: string, subject: string) {
@@ -36,6 +46,20 @@ class Logger {
       })
       .catch((err: any) => {
         this.error('Logger - sendError error: ', err);
+      });
+
+    return request;
+  }
+
+  sendInfo(message: string, subject: string) {
+    const request = this.sender.post(message, subject);
+
+    request
+      .then((response) => {
+        this.info('Logger - sendInfo response: ', JSON.stringify(response));
+      })
+      .catch((err: any) => {
+        this.error('Logger - sendInfo error: ', err);
       });
 
     return request;

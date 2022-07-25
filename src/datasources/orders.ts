@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { MongoDataSource } from 'apollo-datasource-mongodb';
 import { ObjectId } from 'bson';
 import { isUndefined } from 'lodash';
 import { Order, OrderParams, UpdateOrderParams } from '../types';
+import { getNewRandomPin } from '../utilities';
+import logger from '../utilities/logger';
 
 class OrdersAPI extends MongoDataSource<Order> {
   async getOrders(): Promise<Order[] | null> {
@@ -22,20 +23,16 @@ class OrdersAPI extends MongoDataSource<Order> {
 
     response.timestamp = order._id.getTimestamp();
 
-    // console.debug(response);
-
     return response;
   }
 
   async createOrder(amount: string, total: string, symbol: string) {
-    const pin = Math.random().toString().slice(3, 7);
-
     const newOrder = {
       amount,
       total,
       symbol,
       email: '',
-      pin,
+      pin: getNewRandomPin(),
       isPending: true, // True by default
       isPaid: false,
       isWithdrawn: false,
@@ -58,6 +55,10 @@ class OrdersAPI extends MongoDataSource<Order> {
     }
 
     if (!isUndefined(input.isPaid)) {
+      if (input.isPaid) {
+        logger.info(`Order id ${id} is paid.`);
+      }
+
       updatedOrder.isPaid = input.isPaid;
     }
 

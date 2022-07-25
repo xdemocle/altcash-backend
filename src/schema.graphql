@@ -108,6 +108,7 @@ type OrderQueue {
   orderId: String
   isExecuted: Boolean
   isFilled: Boolean
+  hasErrors: Boolean
   timestamp: String
 }
 
@@ -115,6 +116,7 @@ input OrderQueueInput {
   orderId: String
   isExecuted: Boolean
   isFilled: Boolean
+  hasErrors: Boolean
   timestamp: String
 }
 
@@ -138,6 +140,7 @@ type Query {
   getQueue(id: String): OrderQueue
   importAndCheckOrders: [OrderQueue]
   checkPendingPaidOrders: [Order]
+  checkAndExecuteOrderQueue: [OrderQueue]
 }
 
 type Mutation {

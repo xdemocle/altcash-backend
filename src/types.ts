@@ -119,6 +119,7 @@ export interface OrderQueue extends Document {
   orderId: string;
   isExecuted: boolean;
   isFilled: boolean;
+  hasErrors: boolean;
   timestamp: string;
 }
 
@@ -126,15 +127,18 @@ export interface OrderQueueParams {
   orderId: string;
   isExecuted?: boolean;
   isFilled?: boolean;
+  hasErrors?: boolean;
 }
 
 export interface UpdateOrderQueueParams {
   orderId?: string;
   isExecuted?: boolean;
   isFilled?: boolean;
+  hasErrors?: boolean;
 }
 
 export declare abstract class DataSource {
+  executeOrders(orders: OrderQueue[]): OrderQueue[];
   getAllMarkets(): Market[];
   getMarket(id: string): Market;
   getTicker(id: string): Ticker;
@@ -144,6 +148,8 @@ export declare abstract class DataSource {
   getCoin(id: string): Metadata;
   getOrders(): Order[];
   getOrder(id: string): Order;
+  getQueues(): OrderQueue[];
+  getQueue(id: string): OrderQueue;
   createOrder(amount: string, total: string, symbol: string): Order;
   updateOrder(id: string, input: OrderParams): Order;
   createQueue(orderId: string, isExecuted: boolean, isFilled: boolean): OrderQueue;

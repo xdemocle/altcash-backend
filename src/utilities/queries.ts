@@ -1,12 +1,23 @@
 import { gql } from './grapql-client';
 
 export const queryImportAndCheckOrders = gql`
-  query ImportAndCheckOrders {
+  query Query {
     importAndCheckOrders {
       orderId
       isExecuted
       isFilled
-      timestamp
+      hasErrors
+    }
+  }
+`;
+
+export const queryCheckAndExecuteOrderQueue = gql`
+  query Query {
+    checkAndExecuteOrderQueue {
+      orderId
+      isExecuted
+      isFilled
+      hasErrors
     }
   }
 `;
