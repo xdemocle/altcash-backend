@@ -39,8 +39,6 @@ const resolvers = {
         symbol
       );
 
-      logger.info('createOrder', JSON.stringify(sendOrder));
-
       return sendOrder;
     },
     updateOrder: async (
