@@ -42,7 +42,7 @@ class Logger {
 
     request
       .then((response) => {
-        this.info('Logger - sendError response: ', JSON.stringify(response));
+        this.log('Logger - sendError response: ', JSON.stringify(response));
       })
       .catch((err: any) => {
         this.error('Logger - sendError error: ', err);
