@@ -89,20 +89,25 @@ class OrdersQueueAPI extends MongoDataSource<OrderQueue> {
   async executeExchangeOrder(order: Order, queue?: OrderQueue) {
     let postBinanceOrder;
     let isFilled = false;
+    let hasErrors = false;
     const binanceApi = this.context.dataSources.marketsAPI;
 
     try {
+      // Make the Binance API call
       postBinanceOrder = await binanceApi.postOrder(order);
 
       // Update order with binance api response
       const updateOrderReference = await this.updateOrderReference(order, postBinanceOrder);
 
+      // Check is status is OK and order went trough
       if (postBinanceOrder.statusText === 'OK') {
+        // Update the isFilled local var
         isFilled = postBinanceOrder.data.status === 'FILLED';
       } else {
-        // Check if previous query was already present and executed
+        // If not: Check if previous query was already present and executed
+        // and mark it with errors.
         if (queue && queue.isExecuted) {
-          this.markQueueWithError(order);
+          hasErrors = true;
         }
 
         logger.error(`executeExchangeOrder:\npostBinanceOrder error: ${JSON.stringify(postBinanceOrder)}`);
@@ -110,13 +115,16 @@ class OrdersQueueAPI extends MongoDataSource<OrderQueue> {
 
       const updatedOrderQueue = await this.updateQueueByOrderId(String(order._id), {
         isExecuted: true,
-        isFilled
+        isFilled,
+        hasErrors
       });
 
       logger.log(`executeExchangeOrder:\nupdateOrderReference: ${JSON.stringify(updateOrderReference)}`);
       logger.log(`executeExchangeOrder:\nupdatedOrderQueue ${JSON.stringify(updatedOrderQueue)}`);
     } catch (error) {
-      // Check if previous query was already present and executed
+      // Check if previous query was already present and executed.
+      // This to avoid in putting network requests issues and mark the order
+      // queue with hasErrors = true.
       if (queue && queue.isExecuted) {
         this.markQueueWithError(order);
       }

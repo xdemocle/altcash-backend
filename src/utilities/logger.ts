@@ -9,15 +9,15 @@ class Logger {
     return new Date().toISOString();
   }
 
-  log(log: any, ...args: string[]) {
+  log(log: any, ...args: any[]) {
     console.log(`[${this.timestamp}]`, 'Logger - log: ', log, ...args);
   }
 
-  debug(debug: any, ...args: string[]) {
+  debug(debug: any, ...args: any[]) {
     console.debug(`[${this.timestamp}]`, 'Logger - debug: ', debug, ...args);
   }
 
-  error(error: any, ...args: string[]) {
+  error(error: any, ...args: any[]) {
     const subject = 'Logger - error: ';
 
     // if (NODE_ENV !== 'development') {
@@ -27,7 +27,7 @@ class Logger {
     console.error(`[${this.timestamp}]`, subject, Error(error), ...args);
   }
 
-  info(info: any, ...args: string[]) {
+  info(info: any, ...args: any[]) {
     const subject = 'Logger - info: ';
 
     // if (NODE_ENV !== 'development') {

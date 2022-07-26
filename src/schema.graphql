@@ -139,17 +139,10 @@ type Query {
   getQueues: [OrderQueue!]
   getQueue(id: String): OrderQueue
   importAndCheckOrders: [OrderQueue]
-  checkPendingPaidOrders: [Order]
   checkAndExecuteOrderQueue: [OrderQueue]
 }
 
 type Mutation {
   createOrder(amount: String, total: String, symbol: String): Order!
   updateOrder(id: String, input: OrderInput): Order!
-  createQueueOrder(
-    orderId: String
-    isExecuted: Boolean
-    isFilled: Boolean
-  ): OrderQueue!
-  updateQueueOrder(id: String, input: OrderQueueInput): OrderQueue!
 }

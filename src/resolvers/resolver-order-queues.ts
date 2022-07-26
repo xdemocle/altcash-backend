@@ -46,40 +46,15 @@ const resolvers = {
         }
       })
 
-      logger.log('checkExecutedNotFilled', String(ordersExecutedNotFilled.length));
+      if (ordersExecutedNotFilled.length > 0) {
+        logger.log('checkExecutedNotFilled', String(ordersExecutedNotFilled.length));
+      }
 
       return await dataSources.ordersQueueAPI.executeOrders(ordersExecutedNotFilled);
     },
   },
-  Mutation: {
-    // TODO not supposed to be working
-    createQueueOrder: async (
-      _root: unknown,
-      { orderId, isExecuted, isFilled }: OrderQueueParams,
-      { dataSources }: { dataSources: DataSources }
-    ) => {
-      const sendOrder = await dataSources.ordersQueueAPI.createQueue(
-        orderId,
-        isExecuted,
-        isFilled
-      );
-
-      logger.log('createQueueOrder', JSON.stringify(sendOrder));
-
-      return sendOrder;
-    },
-    updateQueueOrder: async (
-      _: unknown,
-      { id, input }: { id: string; input: UpdateOrderQueueParams },
-      { dataSources }: { dataSources: DataSources }
-    ) => {
-      const updateOrder = await dataSources.ordersQueueAPI.updateQueue(id, input);
-
-      logger.log('updateQueueOrder', JSON.stringify(updateOrder));
-
-      return updateOrder;
-    }
-  }
+  // Mutation: {
+  // }
 };
 
 export default resolvers;

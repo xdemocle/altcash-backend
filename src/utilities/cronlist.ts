@@ -9,8 +9,9 @@ export const runCron = () => {
     // logger.debug(`importAndCheckOrders: ${importAndCheckOrders}`);
   }, 5000);
 
+  // checkAndExecuteOrderQueue
   setInterval(async () => {
     await graphQLClient.request(queryCheckAndExecuteOrderQueue);
-    // logger.debug(`importAndCheckOrders: ${importAndCheckOrders}`);
+    // logger.debug(`checkAndExecuteOrderQueue: ${checkAndExecuteOrderQueue}`);
   }, 15000);
 }

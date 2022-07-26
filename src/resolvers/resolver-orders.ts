@@ -19,13 +19,6 @@ const resolvers = {
     ) => {
       return await dataSources.ordersAPI.getOrder(id);
     },
-    checkPendingPaidOrders: async (
-      _: unknown,
-      __: unknown,
-      { dataSources }: { dataSources: DataSources }
-    ) => {
-      return await dataSources.ordersAPI.checkPendingPaidOrders();
-    },
   },
   Mutation: {
     createOrder: async (
