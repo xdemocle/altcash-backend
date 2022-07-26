@@ -7,12 +7,15 @@ export const runCron = () => {
   // importAndCheckOrders
   cron.schedule('*/5 * * * * *', async () => {
     await graphQLClient.request(queryImportAndCheckOrders);
+
+    setTimeout(async () => {
+      await graphQLClient.request(queryCheckAndExecuteOrderQueue);
+    }, 1500)
+    // logger.debug(`importAndCheckOrders: ${importAndCheckOrders}`);
     // logger.debug(`importAndCheckOrders: ${importAndCheckOrders}`);
   });
 
   // Orders queue processing
-  cron.schedule('*/15 * * * * *', async () => {
-    await graphQLClient.request(queryCheckAndExecuteOrderQueue);
-    // logger.debug(`importAndCheckOrders: ${importAndCheckOrders}`);
-  });
+  // cron.schedule('*/15 * * * * *', async () => {
+  // });
 }
