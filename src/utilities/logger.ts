@@ -30,9 +30,9 @@ class Logger {
   info(info: any, ...args: string[]) {
     const subject = 'Logger - info: ';
 
-    if (NODE_ENV !== 'development') {
-      this.sendInfo(JSON.stringify(info), subject);
-    }
+    // if (NODE_ENV !== 'development') {
+    //   this.sendInfo(JSON.stringify(info), subject);
+    // }
 
     console.info(`[${this.timestamp}]`, subject, info, ...args);
   }

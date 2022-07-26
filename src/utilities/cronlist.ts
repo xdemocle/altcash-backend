@@ -1,6 +1,6 @@
 import cron from 'node-cron';
 import graphQLClient from './grapql-client';
-import logger from './logger';
+// import logger from './logger';
 import { queryCheckAndExecuteOrderQueue, queryImportAndCheckOrders } from './queries';
 
 export const runCron = () => {
