@@ -20,9 +20,9 @@ class Logger {
   error(error: any, ...args: string[]) {
     const subject = 'Logger - error: ';
 
-    if (NODE_ENV !== 'development') {
-      this.sendError(JSON.stringify(error), subject);
-    }
+    // if (NODE_ENV !== 'development') {
+    //   this.sendError(JSON.stringify(error), subject);
+    // }
 
     console.error(`[${this.timestamp}]`, subject, Error(error), ...args);
   }
