@@ -119,8 +119,8 @@ class OrdersQueueAPI extends MongoDataSource<OrderQueue> {
         hasErrors
       });
 
-      logger.log(`executeExchangeOrder:\nupdateOrderReference: ${JSON.stringify(updateOrderReference)}`);
-      logger.log(`executeExchangeOrder:\nupdatedOrderQueue ${JSON.stringify(updatedOrderQueue)}`);
+      // logger.log(`executeExchangeOrder:\nupdateOrderReference: ${JSON.stringify(updateOrderReference)}`);
+      // logger.log(`executeExchangeOrder:\nupdatedOrderQueue ${JSON.stringify(updatedOrderQueue)}`);
     } catch (error) {
       // Check if previous query was already present and executed.
       // This to avoid in putting network requests issues and mark the order

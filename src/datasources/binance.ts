@@ -110,12 +110,11 @@ class BinanceAPI extends RESTDataSource {
     if (Number(accountBalance.free) > 0.0006) {
       // make the order
       try {
-        apiResponse = await this.clientTestnet.newOrder(`${order.symbol.toUpperCase()}BTC`, 'BUY', 'MARKET', {
+        apiResponse = await this.client.newOrderTest(`${order.symbol.toUpperCase()}BTC`, 'BUY', 'MARKET', {
           // price: '0.001',
           // timeInForce: 'GTC'
           quantity: order.amount,
         });
-        logger.log('Binance postOrder', apiResponse)
       } catch (error) {
         let err = error;
 
@@ -123,10 +122,15 @@ class BinanceAPI extends RESTDataSource {
           err = error.response.data;
         }
 
-        return new Error(`Binance.postOrder: ${JSON.stringify(err)}`);
+        // return new Error(`Binance.postOrder error: ${JSON.stringify(err)}`);
+        apiResponse = err;
       }
     } else {
-      return new Error(`Binance.postOrder: ${ERROR.nofunds} ${JSON.stringify(accountBalance)}`);
+      // return new Error(`Binance.postOrder: ${ERROR.nofunds} ${JSON.stringify(accountBalance)}`);
+      apiResponse = {
+        code: -1000,
+        msg: `${ERROR.nofunds}, Balance: ${JSON.stringify(accountBalance)}`
+      };
     }
 
     return apiResponse;
