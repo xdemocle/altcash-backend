@@ -12,11 +12,13 @@ directive @cacheControl(
 type Market @cacheControl(maxAge: 3600) {
   id: String
   symbol: String!
-  baseAsset: String!
-  quoteAsset: String!
   name: String
   status: String
+  baseAsset: String!
+  quoteAsset: String!
+  quotePrecision: Float!
   minTradeSize: Float
+  stepSize: Float
 }
 
 type Summary @cacheControl(maxAge: 3600) {

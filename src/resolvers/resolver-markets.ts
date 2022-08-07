@@ -40,6 +40,10 @@ const queryMarkets = async (
     market.minTradeSize = Number(
       find(market.filters, { filterType: 'LOT_SIZE' }).minQty
     );
+
+    market.stepSize = Number(
+      find(market.filters, { filterType: 'LOT_SIZE' }).stepSize
+    );
   });
 
   // Order by name
@@ -124,8 +128,12 @@ const queryMarket = async (
     symbol: market.baseAsset,
     baseAsset: market.baseAsset,
     quoteAsset: market.quoteAsset,
+    quotePrecision: market.quoteAssetPrecision,
     minTradeSize: Number(
       find(market.filters, { filterType: 'LOT_SIZE' }).minQty
+    ),
+    stepSize: Number(
+      find(market.filters, { filterType: 'LOT_SIZE' }).stepSize
     ),
     status: market.status,
     name: metaCoin.name

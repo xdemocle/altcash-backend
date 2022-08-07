@@ -31,7 +31,9 @@ export interface Market {
   symbol: string;
   baseAsset: string;
   quoteAsset: string;
+  quotePrecision: number;
   minTradeSize: number;
+  stepSize: number;
   status: string;
   name: string;
 }
