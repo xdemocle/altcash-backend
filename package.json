@@ -6,8 +6,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "npm run build && cp src/schema.graphql dist/ && node dist/index.js",
-    "prod": "npm run build && cp src/schema.graphql dist/ && nodemon ./dist/index.js",
-    "build": "$(npm bin)/tsc -p .",
+    "build": "$(npm bin)/tsc -p . && cp src/schema.graphql dist/",
     "dev": "nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts"
   },
   "keywords": [],
