@@ -59,7 +59,7 @@ export const instanceServer = (httpServer: any) => {
     }),
     cache: new BaseRedisCache({
       client: new Redis(
-        process.env.HEROKU_REDIS_CHARCOAL_TLS_URL || '127.0.0.1',
+        process.env.REDIS_TLS_URL || '127.0.0.1',
         REDIS_OPTIONS
       ),
     }),
