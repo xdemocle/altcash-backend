@@ -42,4 +42,4 @@ jobs:
       - name: Deploy with rsync
         run: rsync -avz ./dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/rocco/altcash-backend-staging/
       - name: Deploy with rsync
-        run: rsync -avz ./node_modules ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/rocco/altcash-backend-staging/node_modules
+        run: rsync -avz ./node_modules ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/rocco/altcash-backend-staging/
