@@ -6,6 +6,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "yarn build && cp src/schema.graphql dist/ && node dist/index.js",
+    "prod": "yarn build && cp src/schema.graphql dist/ && nodemon ./dist/index.js",
     "build": "$(yarn bin)/tsc -p .",
     "dev": "nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts"
   },
@@ -36,6 +37,7 @@
     "isomorphic-fetch": "^3.0.0",
     "lodash": "^4.17.21",
     "mongoose": "^6.4.0",
+    "nodemon": "^2.0.16",
     "node-mailjet": "^5.0.1",
     "path": "^0.12.7",
     "ts-node": "^10.8.1",
@@ -43,7 +45,6 @@
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^3.3.0",
-    "nodemon": "^2.0.16",
     "prettier": "^2.7.1"
   },
   "engines": {
