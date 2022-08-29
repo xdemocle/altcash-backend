@@ -5,9 +5,9 @@
   "author": "Rocco R. <im@rocco.me>",
   "main": "src/index.js",
   "scripts": {
-    "start": "yarn build && cp src/schema.graphql dist/ && node dist/index.js",
-    "prod": "yarn build && cp src/schema.graphql dist/ && nodemon ./dist/index.js",
-    "build": "$(yarn bin)/tsc -p .",
+    "start": "npm run build && cp src/schema.graphql dist/ && node dist/index.js",
+    "prod": "npm run build && cp src/schema.graphql dist/ && nodemon ./dist/index.js",
+    "build": "$(npm bin)/tsc -p .",
     "dev": "nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts"
   },
   "keywords": [],
