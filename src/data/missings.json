@@ -877,5 +877,9 @@
   {
     "symbol": "OP",
     "name": "Optimism"
+  },
+  {
+    "symbol": "STG",
+    "name": "STG"
   }
 ]
