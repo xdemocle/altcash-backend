@@ -7,7 +7,7 @@ import responseCachePlugin from 'apollo-server-plugin-response-cache';
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
 import { loadSchemaSync } from '@graphql-tools/load';
 import { join } from 'path';
-// import { InMemoryLRUCache } from '@apollo/utils.keyvaluecache';
+import { InMemoryLRUCache } from '@apollo/utils.keyvaluecache';
 import BinanceAPI from '../datasources/binance';
 import MetadataAPI from '../datasources/metadata';
 import MybitxAPI from '../datasources/mybitx';
@@ -57,19 +57,19 @@ export const instanceServer = (httpServer: any) => {
       ordersAPI: new OrdersAPI(OrderModel),
       ordersQueueAPI: new OrdersQueueAPI(OrderQueueModel),
     }),
-    cache: new BaseRedisCache({
-      client: new Redis(
-        process.env.HEROKU_REDIS_CHARCOAL_TLS_URL || '127.0.0.1',
-        REDIS_OPTIONS
-      ),
-    }),
-    // cache: new InMemoryLRUCache({
-    //   max: 500,
-    //   // ~100MiB
-    //   maxSize: Math.pow(2, 20) * 100,
-    //   // 5 minutes (in milliseconds)
-    //   ttl: 300_000,
+    // cache: new BaseRedisCache({
+    //   client: new Redis(
+    //     process.env.HEROKU_REDIS_CHARCOAL_TLS_URL || '127.0.0.1',
+    //     REDIS_OPTIONS
+    //   ),
     // }),
+    cache: new InMemoryLRUCache({
+      max: 500,
+      // ~100MiB
+      maxSize: Math.pow(2, 20) * 100,
+      // 5 minutes (in milliseconds)
+      ttl: 300_000,
+    }),
     csrfPrevention: true,
     plugins: [
       responseCachePlugin(),
