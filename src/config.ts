@@ -21,7 +21,9 @@ export const BINANCE_API_KEY_TESTNET = process.env.BINANCE_API_KEY_TESTNET;
 export const BINANCE_API_SECRET_TESTNET = process.env.BINANCE_API_SECRET_TESTNET;
 
 const getRedisOptions = () => {
-  const redisOptions: { tls?: { rejectUnauthorized: boolean } } = {};
+  const redisOptions: { tls?: { rejectUnauthorized: boolean }, connectTimeout: number } = {
+    connectTimeout: 10000
+  };
 
   if (process.env.NODE_ENV === 'production') {
     redisOptions.tls = {
