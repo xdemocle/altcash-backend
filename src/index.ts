@@ -1,9 +1,15 @@
+import fs from 'fs';
 import express from 'express';
 import http from 'http';
 import { runCron } from './utilities/cronlist';
 import { connectMongo } from './utilities/db';
 import { instanceServer } from './utilities/apollo';
-import { SERVER_HTTP_PORT } from './config';
+import { NODE_ENV, SERVER_HTTP_PORT } from './config';
+
+if (NODE_ENV !== 'development') {
+  const access = fs.createWriteStream('./altcash.log');
+  process.stdout.write = process.stderr.write = access.write.bind(access);
+}
 
 // We connect mongoose to our local mongodb database
 connectMongo()

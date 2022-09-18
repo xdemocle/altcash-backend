@@ -8,7 +8,7 @@ import {
   BINANCE_API_SECRET_TESTNET,
   BINANCE_API_URL,
 } from '../config';
-import { BinanceOrderResponse, Order } from '../types';
+import { AccountStatus, BinanceOrderResponse, Order } from '../types';
 import logger from '../utilities/logger';
 
 const ERROR = {
@@ -89,8 +89,32 @@ class BinanceAPI extends RESTDataSource {
 
   async getAccountData(): Promise<Record<string, string>> {
     const response = await this.client.account();
-    // console.debug('getAccountData', response.data);
+
     return response.data;
+  }
+
+  async getCanTrade(): Promise<AccountStatus> {
+    let canTrade = false;
+    let msg = '';
+
+    const accountData = await this.getAccountData();
+
+    if (!accountData.canTrade) {
+      msg = `Binance.postOrder: ${ERROR.notrade}`;
+    } else {
+      const accountBalance = find(accountData.balances as any, { asset: 'BTC' });
+
+      if (Number(accountBalance.free) > 0.0006) {
+        canTrade = true;
+      } else {
+        msg = `${ERROR.nofunds}, Balance: ${JSON.stringify(accountBalance)}`
+      }
+    }
+
+    return {
+      canTrade,
+      msg
+    };
   }
 
   async postOrder(order: Order): Promise<BinanceOrderResponse | Error> {
@@ -102,7 +126,7 @@ class BinanceAPI extends RESTDataSource {
     }
 
     const accountBalance = find(accountData.balances as any, { asset: 'BTC' });
-    // logger.debug(`accountBalance: ${JSON.stringify(accountBalance)}`);
+    logger.debug(`accountBalance: ${JSON.stringify(accountBalance)}`);
 
     let apiResponse = null;
 
@@ -110,7 +134,7 @@ class BinanceAPI extends RESTDataSource {
     if (Number(accountBalance.free) > 0.0006) {
       // make the order
       try {
-        apiResponse = await this.client.newOrderTest(`${order.symbol.toUpperCase()}BTC`, 'BUY', 'MARKET', {
+        apiResponse = await this.client.newOrder(`${order.symbol.toUpperCase()}BTC`, 'BUY', 'MARKET', {
           // price: '0.001',
           // timeInForce: 'GTC'
           quantity: order.amount,
@@ -123,13 +147,15 @@ class BinanceAPI extends RESTDataSource {
         }
 
         // return new Error(`Binance.postOrder error: ${JSON.stringify(err)}`);
-        apiResponse = err;
+        apiResponse = { data: err };
       }
     } else {
       // return new Error(`Binance.postOrder: ${ERROR.nofunds} ${JSON.stringify(accountBalance)}`);
       apiResponse = {
-        code: -1000,
-        msg: `${ERROR.nofunds}, Balance: ${JSON.stringify(accountBalance)}`
+        data: {
+          code: -1000,
+          msg: `${ERROR.nofunds}, Balance: ${JSON.stringify(accountBalance)}`
+        }
       };
     }
 

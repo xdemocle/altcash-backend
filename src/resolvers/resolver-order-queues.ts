@@ -1,5 +1,5 @@
-import { each, isUndefined } from 'lodash';
-import { DataSources, OrderQueue, OrderQueueParams, UpdateOrderQueueParams } from '../types';
+import { each } from 'lodash';
+import { DataSources, OrderQueue } from '../types';
 import logger from '../utilities/logger';
 
 // Resolvers define the technique for fetching the types defined in the schema.

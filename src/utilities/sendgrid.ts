@@ -9,13 +9,6 @@ sgMail.setApiKey(SENDGRID_API_KEY);
 class Sendgrid {
   sender = sgMail;
 
-  // constructor() {
-  //   this.mailjet = new NodeMailjet({
-  //     apiKey: env.key,
-  //     apiSecret: env.secret
-  //   });
-  // }
-
   post(message: any, subject: string) {
     const msg = {
       to: 'hello@rocco.me', // Change to your recipient

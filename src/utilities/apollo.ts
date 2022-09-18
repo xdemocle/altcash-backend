@@ -21,7 +21,7 @@ import resolverSummaries from '../resolvers/resolver-summaries';
 import resolverTickers from '../resolvers/resolver-tickers';
 import OrdersAPI from '../datasources/orders';
 import OrderModel from '../models/orders';
-import { REDIS_OPTIONS } from '../config';
+// import { REDIS_OPTIONS } from '../config';
 import OrdersQueueAPI from '../datasources/orders-queue';
 import OrderQueueModel from '../models/orders-queue';
 import resolverOrderQueues from '../resolvers/resolver-order-queues';

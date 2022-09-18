@@ -1,17 +1,23 @@
 import graphQLClient from './grapql-client';
-// import logger from './logger';
+import logger from './logger';
 import { queryCheckAndExecuteOrderQueue, queryImportAndCheckOrders } from './queries';
 
 export const runCron = () => {
   // importAndCheckOrders
   setInterval(async () => {
-    await graphQLClient.request(queryImportAndCheckOrders);
-    // logger.debug(`importAndCheckOrders: ${importAndCheckOrders}`);
+    const query = await graphQLClient.request(queryImportAndCheckOrders);
+
+    if (!!query.importAndCheckOrders.length) {
+      logger.debug(JSON.stringify(query.importAndCheckOrders));
+    }
   }, 5000);
 
   // checkAndExecuteOrderQueue
   setInterval(async () => {
-    await graphQLClient.request(queryCheckAndExecuteOrderQueue);
-    // logger.debug(`checkAndExecuteOrderQueue: ${checkAndExecuteOrderQueue}`);
+    const query = await graphQLClient.request(queryCheckAndExecuteOrderQueue);
+
+    if (!!query.checkAndExecuteOrderQueue.length) {
+      logger.debug(JSON.stringify(query.checkAndExecuteOrderQueue));
+    }
   }, 15000);
 }

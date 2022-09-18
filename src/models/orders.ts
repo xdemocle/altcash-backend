@@ -13,6 +13,7 @@ export const OrderSchemaObject = {
   isCancelled: { type: Boolean },
   wallet: { type: String },
   reference: { type: String },
+  hasErrors: { type: Boolean },
   orderReferences: { type: Array }
 };
 

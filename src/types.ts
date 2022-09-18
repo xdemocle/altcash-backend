@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Document } from 'mongoose';
 
+export interface AccountStatus {
+  canTrade: boolean;
+  msg: string;
+}
+
 export interface MetadataUrls {
   website: string[];
   twitter: string[];
@@ -33,6 +38,7 @@ export interface Market {
   quoteAsset: string;
   quotePrecision: number;
   minTradeSize: number;
+  minNotional: number;
   stepSize: number;
   status: string;
   name: string;
@@ -87,6 +93,7 @@ export interface Order extends Document {
   isCancelled?: boolean;
   wallet?: string;
   reference: string;
+  hasErrors?: boolean;
   orderReferences: string[];
   timestamp: string;
 }
@@ -103,6 +110,7 @@ export interface OrderParams {
   isCancelled?: boolean;
   wallet?: string;
   reference?: string;
+  hasErrors?: boolean;
   orderReferences?: string[];
 }
 
@@ -140,6 +148,7 @@ export interface UpdateOrderQueueParams {
 }
 
 export declare abstract class DataSource {
+  getCanTrade(): AccountStatus;
   executeOrders(orders: OrderQueue[]): OrderQueue[];
   getAllMarkets(): Market[];
   getMarket(id: string): Market;

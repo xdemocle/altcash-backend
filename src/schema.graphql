@@ -9,6 +9,11 @@ directive @cacheControl(
   inheritMaxAge: Boolean
 ) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
 
+type AccountStatus {
+  canTrade: Boolean
+  msg: String
+}
+
 type Market @cacheControl(maxAge: 3600) {
   id: String
   symbol: String!
@@ -18,6 +23,7 @@ type Market @cacheControl(maxAge: 3600) {
   quoteAsset: String!
   quotePrecision: Float!
   minTradeSize: Float
+  minNotional: Float
   stepSize: Float
 }
 
@@ -88,6 +94,7 @@ type Order {
   wallet: String
   reference: String
   orderReferences: [String]
+  hasErrors: Boolean
   timestamp: String
 }
 
@@ -103,6 +110,7 @@ input OrderInput {
   isCancelled: Boolean
   wallet: String
   reference: String
+  hasErrors: Boolean
   orderReferences: [String]
 }
 
@@ -142,6 +150,7 @@ type Query {
   getQueue(id: String): OrderQueue
   importAndCheckOrders: [OrderQueue]
   checkAndExecuteOrderQueue: [OrderQueue]
+  canTrade: AccountStatus
 }
 
 type Mutation {

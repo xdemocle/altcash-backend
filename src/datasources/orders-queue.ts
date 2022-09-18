@@ -1,6 +1,6 @@
 import { MongoDataSource } from 'apollo-datasource-mongodb';
 import { ObjectId } from 'bson';
-import { each, isUndefined } from 'lodash';
+import { clone, each, isUndefined } from 'lodash';
 import {
   OrderQueueParams,
   OrderQueue,
@@ -48,7 +48,7 @@ class OrdersQueueAPI extends MongoDataSource<OrderQueue> {
     });
   }
 
-  updateQueue = async (id: string, input: UpdateOrderQueueParams) => {
+  async updateQueue(id: string, input: UpdateOrderQueueParams) {
     this.deleteFromCacheById(id);
 
     const updatedQueueOrder = this.getUpdatedQueueOrder(input);
@@ -97,49 +97,52 @@ class OrdersQueueAPI extends MongoDataSource<OrderQueue> {
       postBinanceOrder = await binanceApi.postOrder(order);
 
       // Update order with binance api response
-      const updateOrderReference = await this.updateOrderReference(order, postBinanceOrder);
+      await this.updateOrderReference(order, clone(postBinanceOrder));
 
       // Check is status is OK and order went trough
       if (postBinanceOrder.statusText === 'OK') {
         // Update the isFilled local var
-        isFilled = postBinanceOrder.data.status === 'FILLED';
+        isFilled = !!postBinanceOrder.data.orderId;
       } else {
         // If not: Check if previous query was already present and executed
         // and mark it with errors.
         if (queue && queue.isExecuted) {
-          hasErrors = true;
+          this.markQueueWithError(order);
+          this.updateOrderHasErrors(order);
         }
 
         logger.error(`executeExchangeOrder:\npostBinanceOrder error: ${JSON.stringify(postBinanceOrder)}`);
       }
 
-      const updatedOrderQueue = await this.updateQueueByOrderId(String(order._id), {
+      await this.updateQueueByOrderId(String(order._id), {
         isExecuted: true,
         isFilled,
         hasErrors
       });
-
-      // logger.log(`executeExchangeOrder:\nupdateOrderReference: ${JSON.stringify(updateOrderReference)}`);
-      // logger.log(`executeExchangeOrder:\nupdatedOrderQueue ${JSON.stringify(updatedOrderQueue)}`);
     } catch (error) {
-      // Check if previous query was already present and executed.
-      // This to avoid in putting network requests issues and mark the order
-      // queue with hasErrors = true.
-      if (queue && queue.isExecuted) {
-        this.markQueueWithError(order);
-      }
+      this.markQueueWithError(order);
+      this.updateOrderHasErrors(order);
 
-      logger.error(`executeExchangeOrder: ${JSON.stringify(error)}`);
+      logger.error(`executeExchangeOrder: ${error && error.message}`);
     }
 
     return postBinanceOrder;
+  }
+
+  async updateOrderHasErrors(order: Order) {
+    return await this.context.dataSources.ordersAPI.updateOrder(
+      String(order._id),
+      {
+        hasErrors: true
+      }
+    );
   }
 
   async updateOrderReference(order: Order, exchangerOrder: BinanceOrderResponse) {
     return await this.context.dataSources.ordersAPI.updateOrder(
       String(order._id),
       {
-        orderReferences: [JSON.stringify(exchangerOrder)]
+        orderReferences: [...order.orderReferences, JSON.stringify(exchangerOrder.data)]
       }
     );
   }

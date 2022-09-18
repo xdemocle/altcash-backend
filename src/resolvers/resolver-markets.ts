@@ -1,5 +1,5 @@
 import { each, filter, find, isUndefined } from 'lodash';
-import { Market, DataSources, MissingMarket } from '../types';
+import { Market, DataSources, MissingMarket, AccountStatus } from '../types';
 
 const queryMarkets = async (
   _: unknown,
@@ -36,6 +36,10 @@ const queryMarkets = async (
     }
 
     market.id = market.symbol = market.baseAsset;
+
+    market.minNotional = Number(
+      find(market.filters, { filterType: 'MIN_NOTIONAL' }).minNotional
+    );
 
     market.minTradeSize = Number(
       find(market.filters, { filterType: 'LOT_SIZE' }).minQty
@@ -129,6 +133,10 @@ const queryMarket = async (
     baseAsset: market.baseAsset,
     quoteAsset: market.quoteAsset,
     quotePrecision: market.quoteAssetPrecision,
+    filters: market.filters,
+    minNotional: Number(
+      find(market.filters, { filterType: 'MIN_NOTIONAL' }).minNotional
+    ),
     minTradeSize: Number(
       find(market.filters, { filterType: 'LOT_SIZE' }).minQty
     ),
@@ -140,12 +148,21 @@ const queryMarket = async (
   };
 };
 
+const queryCanTrade = (
+  _: unknown,
+  __: unknown,
+  { dataSources }: { dataSources: DataSources }
+): AccountStatus => {
+  return dataSources.marketsAPI.getCanTrade();
+};
+
 // Resolvers define the technique for fetching the types defined in the
 // schema. This resolver retrieves books from the "books" array above.
 const resolvers = {
   Query: {
     markets: queryMarkets,
-    market: queryMarket
+    market: queryMarket,
+    canTrade: queryCanTrade,
   }
 };
 
