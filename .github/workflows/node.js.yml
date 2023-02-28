@@ -39,7 +39,7 @@ jobs:
       - run: yarn install --immutable --immutable-cache --check-cache
       - run: yarn build
 
+      - name: Deploy node_modules with rsync
+        run: rsync -avz ./node_modules ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/altcash-backend-staging/
       - name: Deploy with rsync
         run: rsync -avz ./dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/altcash-backend-staging/
-      - name: Deploy with rsync
-        run: rsync -avz ./node_modules ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/altcash-backend-staging/
