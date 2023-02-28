@@ -5,7 +5,7 @@
   "author": "Rocco R. <im@rocco.me>",
   "main": "src/index.js",
   "scripts": {
-    "start": "yarn build && cp src/schema.graphql dist/ && node dist/index.js",
+    "start": "yarn build",
     "build": "$(yarn bin)/tsc -p . && cp src/schema.graphql dist/",
     "dev": "nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts"
   },
@@ -35,7 +35,7 @@
     "ioredis": "^5.2.4",
     "isomorphic-fetch": "^3.0.0",
     "lodash": "^4.17.21",
-    "mongoose": "^6.8.3",
+    "mongoose": "^7.0.0",
     "node-mailjet": "^6.0.0",
     "nodemon": "^2.0.20",
     "path": "^0.12.7",

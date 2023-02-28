@@ -71,6 +71,7 @@ export const instanceServer = (httpServer: any) => {
       ttl: 300_000,
     }),
     csrfPrevention: true,
+    introspection: true,
     plugins: [
       responseCachePlugin(),
       ApolloServerPluginDrainHttpServer({ httpServer }),
