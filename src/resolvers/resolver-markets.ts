@@ -1,5 +1,5 @@
 import { each, filter, find, isUndefined } from 'lodash';
-import { Market, DataSources, MissingMarket, AccountStatus } from '../types';
+import { AccountStatus, DataSources, Market, MissingMarket } from '../types';
 
 const queryMarkets = async (
   _: unknown,
@@ -38,15 +38,15 @@ const queryMarkets = async (
     market.id = market.symbol = market.baseAsset;
 
     market.minNotional = Number(
-      find(market.filters, { filterType: 'MIN_NOTIONAL' }).minNotional
+      find(market.filters, { filterType: 'MIN_NOTIONAL' })?.minNotional
     );
 
     market.minTradeSize = Number(
-      find(market.filters, { filterType: 'LOT_SIZE' }).minQty
+      find(market.filters, { filterType: 'LOT_SIZE' })?.minQty
     );
 
     market.stepSize = Number(
-      find(market.filters, { filterType: 'LOT_SIZE' }).stepSize
+      find(market.filters, { filterType: 'LOT_SIZE' })?.stepSize
     );
   });
 
@@ -126,7 +126,7 @@ const queryMarket = async (
     console.debug('queryMarkets', error);
   }
 
-  // Add the id for client caching purpouse
+  // Add the id for client caching purpose
   return {
     id: market.baseAsset,
     symbol: market.baseAsset,
@@ -135,13 +135,13 @@ const queryMarket = async (
     quotePrecision: market.quoteAssetPrecision,
     filters: market.filters,
     minNotional: Number(
-      find(market.filters, { filterType: 'MIN_NOTIONAL' }).minNotional
+      find(market.filters, { filterType: 'MIN_NOTIONAL' })?.minNotional
     ),
     minTradeSize: Number(
-      find(market.filters, { filterType: 'LOT_SIZE' }).minQty
+      find(market.filters, { filterType: 'LOT_SIZE' })?.minQty
     ),
     stepSize: Number(
-      find(market.filters, { filterType: 'LOT_SIZE' }).stepSize
+      find(market.filters, { filterType: 'LOT_SIZE' })?.stepSize
     ),
     status: market.status,
     name: metaCoin.name
@@ -162,7 +162,7 @@ const resolvers = {
   Query: {
     markets: queryMarkets,
     market: queryMarket,
-    canTrade: queryCanTrade,
+    canTrade: queryCanTrade
   }
 };
 

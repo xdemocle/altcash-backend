@@ -4,9 +4,5 @@ module.exports = {
   semi: true,
   tabWidth: 2,
   bracketSpacing: true,
-  importOrder: [
-    '^[./]'
-  ],
-  importOrderSeparation: true,
-  importOrderSortSpecifiers: true
-}
+  importOrder: ['^[./]']
+};
