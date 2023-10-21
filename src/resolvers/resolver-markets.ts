@@ -38,7 +38,7 @@ const queryMarkets = async (
     market.id = market.symbol = market.baseAsset;
 
     market.minNotional = Number(
-      find(market.filters, { filterType: 'MIN_NOTIONAL' })?.minNotional
+      find(market.filters, { filterType: 'NOTIONAL' })?.minNotional
     );
 
     market.minTradeSize = Number(
@@ -135,7 +135,7 @@ const queryMarket = async (
     quotePrecision: market.quoteAssetPrecision,
     filters: market.filters,
     minNotional: Number(
-      find(market.filters, { filterType: 'MIN_NOTIONAL' })?.minNotional
+      find(market.filters, { filterType: 'NOTIONAL' })?.minNotional
     ),
     minTradeSize: Number(
       find(market.filters, { filterType: 'LOT_SIZE' })?.minQty
