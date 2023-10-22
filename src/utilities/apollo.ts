@@ -4,7 +4,6 @@ import { InMemoryLRUCache } from '@apollo/utils.keyvaluecache';
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
 import { loadSchemaSync } from '@graphql-tools/load';
 import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge';
-import { ApolloServerV3HighlightPlugin } from '@highlight-run/apollo';
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import responseCachePlugin from 'apollo-server-plugin-response-cache';
@@ -26,7 +25,6 @@ import resolverTickers from '../resolvers/resolver-tickers';
 import OrdersQueueAPI from '../datasources/orders-queue';
 import OrderQueueModel from '../models/orders-queue';
 import resolverOrderQueues from '../resolvers/resolver-order-queues';
-import { HIGHLIGHT_NODEJS_SERVICE, HIGHLIGHT_PROJECT_ID } from '../config';
 
 // A schema is a collection of type definitions (hence "typeDefs")
 // that together define the "shape" of queries that are executed against
@@ -76,12 +74,7 @@ export const instanceServer = (httpServer: any) => {
     introspection: true,
     plugins: [
       responseCachePlugin(),
-      ApolloServerPluginDrainHttpServer({ httpServer }),
-      ApolloServerV3HighlightPlugin({
-        projectID: HIGHLIGHT_PROJECT_ID,
-        serviceName: HIGHLIGHT_NODEJS_SERVICE,
-        serviceVersion: 'git-sha'
-      })
+      ApolloServerPluginDrainHttpServer({ httpServer })
     ]
   });
 };

@@ -1,21 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  HIGHLIGHT_NODEJS_SERVICE,
-  HIGHLIGHT_PROJECT_ID,
-  NODE_ENV
-} from '../config';
+import { NODE_ENV } from '../config';
 import Sendgrid from './sendgrid';
 import { createLogger, format, transports } from 'winston';
-
-const highlightTransport = new transports.Http({
-  host: 'pub.highlight.run',
-  path: '/v1/logs/json',
-  ssl: true,
-  headers: {
-    'x-highlight-project': HIGHLIGHT_PROJECT_ID,
-    'x-highlight-service': HIGHLIGHT_NODEJS_SERVICE
-  }
-});
 
 const logger = createLogger({
   level: 'info',
@@ -25,7 +11,7 @@ const logger = createLogger({
     format.timestamp(),
     format.prettyPrint()
   ),
-  transports: [new transports.Console(), highlightTransport]
+  transports: [new transports.Console()]
 });
 
 class Logger {
