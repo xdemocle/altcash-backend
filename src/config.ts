@@ -22,6 +22,10 @@ export const BINANCE_API_KEY_TESTNET = process.env.BINANCE_API_KEY_TESTNET;
 export const BINANCE_API_SECRET_TESTNET =
   process.env.BINANCE_API_SECRET_TESTNET;
 
+export const HIGHLIGHT_PROJECT_ID = 'ng2owjnd';
+
+export const HIGHLIGHT_NODEJS_SERVICE = 'altcash-backend-staging';
+
 const getRedisOptions = () => {
   const redisOptions: {
     tls?: { rejectUnauthorized: boolean };
@@ -40,5 +44,3 @@ const getRedisOptions = () => {
 };
 
 export const REDIS_OPTIONS = getRedisOptions();
-
-export const HIGHLIGHT_PROJECT_ID = 'ng2owjnd';

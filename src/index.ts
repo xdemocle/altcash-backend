@@ -22,8 +22,6 @@ connectMongo()
   })
   .catch((error) => logger.error(error));
 
-// export let httpServer: http.Server = null;
-
 // We start Apollo GraphQL Server
 async function startApolloServer() {
   const app = express();

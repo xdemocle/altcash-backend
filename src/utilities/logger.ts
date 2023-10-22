@@ -1,21 +1,31 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, no-console */
-import { HIGHLIGHT_PROJECT_ID, NODE_ENV } from '../config';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  HIGHLIGHT_NODEJS_SERVICE,
+  HIGHLIGHT_PROJECT_ID,
+  NODE_ENV
+} from '../config';
 import Sendgrid from './sendgrid';
-import pino from 'pino';
+import { createLogger, format, transports } from 'winston';
 
-const pinoLogger = pino({
-  level: 'info',
-  transport: {
-    targets: [
-      {
-        target: '@highlight-run/pino',
-        options: {
-          projectID: HIGHLIGHT_PROJECT_ID
-        },
-        level: 'info'
-      }
-    ]
+const highlightTransport = new transports.Http({
+  host: 'pub.highlight.run',
+  path: '/v1/logs/json',
+  ssl: true,
+  headers: {
+    'x-highlight-project': HIGHLIGHT_PROJECT_ID,
+    'x-highlight-service': HIGHLIGHT_NODEJS_SERVICE
   }
+});
+
+const logger = createLogger({
+  level: 'info',
+  format: format.combine(
+    format.json(),
+    format.errors({ stack: true }),
+    format.timestamp(),
+    format.prettyPrint()
+  ),
+  transports: [new transports.Console(), highlightTransport]
 });
 
 class Logger {
@@ -26,11 +36,11 @@ class Logger {
   }
 
   log(log: any, ...args: any[]) {
-    pinoLogger.info(`[${this.timestamp}]`, 'Logger - log: ', log, ...args);
+    logger.info(`[${this.timestamp}]`, 'Logger - log: ', log, ...args);
   }
 
   debug(debug: any, ...args: any[]) {
-    pinoLogger.debug(`[${this.timestamp}]`, 'Logger - debug: ', debug, ...args);
+    logger.debug(`[${this.timestamp}]`, 'Logger - debug: ', debug, ...args);
   }
 
   error(error: any, ...args: any[]) {
@@ -40,7 +50,7 @@ class Logger {
       this.sendError(JSON.stringify(error), subject);
     }
 
-    pinoLogger.error(`[${this.timestamp}]`, subject, Error(error), ...args);
+    logger.error(`[${this.timestamp}]`, subject, Error(error), ...args);
   }
 
   info(info: any, ...args: any[]) {
@@ -50,7 +60,7 @@ class Logger {
       this.sendInfo(JSON.stringify(info), subject);
     }
 
-    pinoLogger.info(`[${this.timestamp}]`, subject, info, ...args);
+    logger.info(`[${this.timestamp}]`, subject, info, ...args);
   }
 
   sendError(message: string, subject: string) {
