@@ -8,7 +8,9 @@ import {
 export const runCron = () => {
   // importAndCheckOrders
   setInterval(async () => {
-    const query = await graphQLClient.request(queryImportAndCheckOrders);
+    const query: { importAndCheckOrders: [] } = await graphQLClient.request(
+      queryImportAndCheckOrders
+    );
 
     if (!!query.importAndCheckOrders.length) {
       logger.debug(
@@ -19,7 +21,8 @@ export const runCron = () => {
 
   // checkAndExecuteOrderQueue
   setInterval(async () => {
-    const query = await graphQLClient.request(queryCheckAndExecuteOrderQueue);
+    const query: { checkAndExecuteOrderQueue: [] } =
+      await graphQLClient.request(queryCheckAndExecuteOrderQueue);
 
     if (!!query.checkAndExecuteOrderQueue.length) {
       logger.debug(
