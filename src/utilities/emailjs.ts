@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import dotenv from 'dotenv';
+import logger from '../utilities/logger';
 
 require('isomorphic-fetch');
 
@@ -34,11 +35,11 @@ class EmailJS {
         if (response.status >= 400) {
           throw new Error('Bad response from server');
         }
-        console.debug('EmailJS: post response', response);
+        logger.debug('EmailJS: post response', response);
         return response.json();
       })
       .then(function (response) {
-        console.debug(response);
+        logger.debug(response);
       });
   }
 }

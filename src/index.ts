@@ -4,6 +4,7 @@ import http from 'http';
 import { runCron } from './utilities/cronlist';
 import { connectMongo } from './utilities/db';
 import { instanceServer } from './utilities/apollo';
+import logger from './utilities/logger';
 import { NODE_ENV, SERVER_HTTP_PORT } from './config';
 
 if (NODE_ENV !== 'development') {
@@ -17,9 +18,9 @@ connectMongo()
     // Start crons
     runCron();
 
-    console.debug('🎉 Connected to MongoDB database successfully');
+    logger.debug('🎉 Connected to MongoDB database successfully');
   })
-  .catch((error) => console.error(error));
+  .catch((error) => logger.error(error));
 
 // export let httpServer: http.Server = null;
 
@@ -37,7 +38,9 @@ async function startApolloServer() {
     httpServer.listen({ port: SERVER_HTTP_PORT }, resolve)
   );
 
-  console.debug(`🚀 Apollo ready at http://localhost:${SERVER_HTTP_PORT}${server.graphqlPath}`);
+  logger.debug(
+    `🚀 Apollo ready at http://localhost:${SERVER_HTTP_PORT}${server.graphqlPath}`
+  );
 }
 
 startApolloServer();

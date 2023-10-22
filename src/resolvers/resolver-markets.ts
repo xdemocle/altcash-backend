@@ -1,5 +1,6 @@
 import { each, filter, find, isUndefined } from 'lodash';
 import { AccountStatus, DataSources, Market, MissingMarket } from '../types';
+import logger from '../utilities/logger';
 
 const queryMarkets = async (
   _: unknown,
@@ -76,8 +77,7 @@ const queryMarkets = async (
   });
 
   if (missingNamesArr.length > 0) {
-    // eslint-disable-next-line no-console
-    console.log('missingNamesArr', JSON.stringify(missingNamesArr));
+    logger.log('missingNamesArr', JSON.stringify(missingNamesArr));
   }
 
   // Search feature or symbols one
@@ -123,7 +123,7 @@ const queryMarket = async (
   try {
     metaCoin = await dataSources.metadataAPI.getCoin(market.baseAsset);
   } catch (error) {
-    console.debug('queryMarkets', error);
+    logger.debug('queryMarkets', error);
   }
 
   // Add the id for client caching purpose

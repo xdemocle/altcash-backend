@@ -18,7 +18,7 @@ const resolvers = {
       { dataSources }: { dataSources: DataSources }
     ) => {
       return await dataSources.ordersAPI.getOrder(id);
-    },
+    }
   },
   Mutation: {
     createOrder: async (
@@ -41,7 +41,7 @@ const resolvers = {
     ) => {
       const updateOrder = await dataSources.ordersAPI.updateOrder(id, input);
 
-      console.debug('updateOrder', updateOrder);
+      logger.debug('updateOrder', updateOrder);
 
       return updateOrder;
     }

@@ -1,6 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, no-console */
-import { NODE_ENV } from '../config';
+import { HIGHLIGHT_PROJECT_ID, NODE_ENV } from '../config';
 import Sendgrid from './sendgrid';
+import pino from 'pino';
+
+const pinoLogger = pino({
+  level: 'info',
+  transport: {
+    targets: [
+      {
+        target: '@highlight-run/pino',
+        options: {
+          projectID: HIGHLIGHT_PROJECT_ID
+        },
+        level: 'info'
+      }
+    ]
+  }
+});
 
 class Logger {
   sender = new Sendgrid();
@@ -10,11 +26,11 @@ class Logger {
   }
 
   log(log: any, ...args: any[]) {
-    console.log(`[${this.timestamp}]`, 'Logger - log: ', log, ...args);
+    pinoLogger.info(`[${this.timestamp}]`, 'Logger - log: ', log, ...args);
   }
 
   debug(debug: any, ...args: any[]) {
-    console.debug(`[${this.timestamp}]`, 'Logger - debug: ', debug, ...args);
+    pinoLogger.debug(`[${this.timestamp}]`, 'Logger - debug: ', debug, ...args);
   }
 
   error(error: any, ...args: any[]) {
@@ -24,7 +40,7 @@ class Logger {
       this.sendError(JSON.stringify(error), subject);
     }
 
-    console.error(`[${this.timestamp}]`, subject, Error(error), ...args);
+    pinoLogger.error(`[${this.timestamp}]`, subject, Error(error), ...args);
   }
 
   info(info: any, ...args: any[]) {
@@ -34,7 +50,7 @@ class Logger {
       this.sendInfo(JSON.stringify(info), subject);
     }
 
-    console.info(`[${this.timestamp}]`, subject, info, ...args);
+    pinoLogger.info(`[${this.timestamp}]`, subject, info, ...args);
   }
 
   sendError(message: string, subject: string) {
