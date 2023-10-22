@@ -5,7 +5,10 @@ import { runCron } from './utilities/cronlist';
 import { connectMongo } from './utilities/db';
 import { instanceServer } from './utilities/apollo';
 import logger from './utilities/logger';
-import { NODE_ENV, SERVER_HTTP_PORT } from './config';
+import { HIGHLIGHT_PROJECT_ID, NODE_ENV, SERVER_HTTP_PORT } from './config';
+import { H } from '@highlight-run/node';
+
+H.init({ projectID: HIGHLIGHT_PROJECT_ID });
 
 if (NODE_ENV !== 'development') {
   const access = fs.createWriteStream('./altcash.log');

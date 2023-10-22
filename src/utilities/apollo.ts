@@ -1,17 +1,20 @@
 // import Redis from 'ioredis';
 // import { BaseRedisCache } from 'apollo-server-cache-redis';
-import { mergeTypeDefs, mergeResolvers } from '@graphql-tools/merge';
+import { InMemoryLRUCache } from '@apollo/utils.keyvaluecache';
+import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
+import { loadSchemaSync } from '@graphql-tools/load';
+import { mergeResolvers, mergeTypeDefs } from '@graphql-tools/merge';
+import { ApolloServerV3HighlightPlugin } from '@highlight-run/apollo';
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import responseCachePlugin from 'apollo-server-plugin-response-cache';
-import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
-import { loadSchemaSync } from '@graphql-tools/load';
 import { join } from 'path';
-import { InMemoryLRUCache } from '@apollo/utils.keyvaluecache';
 import BinanceAPI from '../datasources/binance';
 import MetadataAPI from '../datasources/metadata';
 import MybitxAPI from '../datasources/mybitx';
 import NamesAPI from '../datasources/names';
+import OrdersAPI from '../datasources/orders';
+import OrderModel from '../models/orders';
 import resolverCount from '../resolvers/resolver-count';
 import resolverMarkets from '../resolvers/resolver-markets';
 import resolverMeta from '../resolvers/resolver-meta';
@@ -19,18 +22,17 @@ import resolverOrders from '../resolvers/resolver-orders';
 import resolverPair from '../resolvers/resolver-pair';
 import resolverSummaries from '../resolvers/resolver-summaries';
 import resolverTickers from '../resolvers/resolver-tickers';
-import OrdersAPI from '../datasources/orders';
-import OrderModel from '../models/orders';
 // import { REDIS_OPTIONS } from '../config';
 import OrdersQueueAPI from '../datasources/orders-queue';
 import OrderQueueModel from '../models/orders-queue';
 import resolverOrderQueues from '../resolvers/resolver-order-queues';
+import { HIGHLIGHT_NODEJS_SERVICE, HIGHLIGHT_PROJECT_ID } from '../config';
 
 // A schema is a collection of type definitions (hence "typeDefs")
 // that together define the "shape" of queries that are executed against
 // your data.
 export const typeDefs = loadSchemaSync(join(__dirname, '../schema.graphql'), {
-  loaders: [new GraphQLFileLoader()],
+  loaders: [new GraphQLFileLoader()]
 });
 
 // The ApolloServer constructor requires two parameters: your schema
@@ -46,7 +48,7 @@ export const instanceServer = (httpServer: any) => {
       resolverSummaries,
       resolverTickers,
       resolverOrders,
-      resolverOrderQueues,
+      resolverOrderQueues
     ]),
     // context: accountsGraphQL.context,
     dataSources: () => ({
@@ -55,7 +57,7 @@ export const instanceServer = (httpServer: any) => {
       namesAPI: new NamesAPI(),
       mybitxAPI: new MybitxAPI(),
       ordersAPI: new OrdersAPI(OrderModel),
-      ordersQueueAPI: new OrdersQueueAPI(OrderQueueModel),
+      ordersQueueAPI: new OrdersQueueAPI(OrderQueueModel)
     }),
     // cache: new BaseRedisCache({
     //   client: new Redis(
@@ -68,13 +70,18 @@ export const instanceServer = (httpServer: any) => {
       // ~100MiB
       maxSize: Math.pow(2, 20) * 100,
       // 5 minutes (in milliseconds)
-      ttl: 300_000,
+      ttl: 300_000
     }),
     csrfPrevention: true,
     introspection: true,
     plugins: [
       responseCachePlugin(),
       ApolloServerPluginDrainHttpServer({ httpServer }),
-    ],
+      ApolloServerV3HighlightPlugin({
+        projectID: HIGHLIGHT_PROJECT_ID,
+        serviceName: HIGHLIGHT_NODEJS_SERVICE,
+        serviceVersion: 'git-sha'
+      })
+    ]
   });
-}
+};
