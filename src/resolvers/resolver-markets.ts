@@ -77,7 +77,7 @@ const queryMarkets = async (
   });
 
   if (missingNamesArr.length > 0) {
-    logger.log('missingNamesArr', JSON.stringify(missingNamesArr));
+    logger.info(`missingNamesArr ${JSON.stringify(missingNamesArr)}`);
   }
 
   // Search feature or symbols one
@@ -123,7 +123,7 @@ const queryMarket = async (
   try {
     metaCoin = await dataSources.metadataAPI.getCoin(market.baseAsset);
   } catch (error) {
-    logger.debug('queryMarkets', error);
+    logger.debug(`queryMarkets ${error}`);
   }
 
   // Add the id for client caching purpose

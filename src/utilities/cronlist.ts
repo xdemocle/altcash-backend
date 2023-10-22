@@ -1,6 +1,9 @@
 import graphQLClient from './grapql-client';
 import logger from './logger';
-import { queryCheckAndExecuteOrderQueue, queryImportAndCheckOrders } from './queries';
+import {
+  queryCheckAndExecuteOrderQueue,
+  queryImportAndCheckOrders
+} from './queries';
 
 export const runCron = () => {
   // importAndCheckOrders
@@ -8,7 +11,9 @@ export const runCron = () => {
     const query = await graphQLClient.request(queryImportAndCheckOrders);
 
     if (!!query.importAndCheckOrders.length) {
-      logger.debug(JSON.stringify(query.importAndCheckOrders));
+      logger.debug(
+        `importAndCheckOrders ${JSON.stringify(query.importAndCheckOrders)}`
+      );
     }
   }, 5000);
 
@@ -17,7 +22,11 @@ export const runCron = () => {
     const query = await graphQLClient.request(queryCheckAndExecuteOrderQueue);
 
     if (!!query.checkAndExecuteOrderQueue.length) {
-      logger.debug(JSON.stringify(query.checkAndExecuteOrderQueue));
+      logger.debug(
+        `checkAndExecuteOrderQueue ${JSON.stringify(
+          query.checkAndExecuteOrderQueue
+        )}`
+      );
     }
   }, 15000);
-}
+};

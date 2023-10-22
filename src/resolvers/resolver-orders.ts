@@ -41,7 +41,7 @@ const resolvers = {
     ) => {
       const updateOrder = await dataSources.ordersAPI.updateOrder(id, input);
 
-      logger.debug('updateOrder', updateOrder);
+      logger.debug(`updateOrder ${updateOrder}`);
 
       return updateOrder;
     }

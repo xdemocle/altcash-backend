@@ -24,9 +24,12 @@ const resolvers = {
       __: unknown,
       { dataSources }: { dataSources: DataSources }
     ) => {
-      const checkPendingPaidOrders = await dataSources.ordersAPI.checkPendingPaidOrders();
+      const checkPendingPaidOrders =
+        await dataSources.ordersAPI.checkPendingPaidOrders();
 
-      return await dataSources.ordersQueueAPI.importAndCheckOrders(checkPendingPaidOrders);
+      return await dataSources.ordersQueueAPI.importAndCheckOrders(
+        checkPendingPaidOrders
+      );
     },
     checkAndExecuteOrderQueue: async (
       _root: unknown,
@@ -34,7 +37,7 @@ const resolvers = {
       { dataSources }: { dataSources: DataSources }
     ) => {
       const queue = await dataSources.ordersQueueAPI.getQueues();
-      const ordersExecutedNotFilled: OrderQueue[] = []
+      const ordersExecutedNotFilled: OrderQueue[] = [];
 
       each(queue, (orderQueue) => {
         if (
@@ -44,15 +47,19 @@ const resolvers = {
         ) {
           ordersExecutedNotFilled.push(orderQueue);
         }
-      })
+      });
 
       if (ordersExecutedNotFilled.length > 0) {
-        logger.log('checkExecutedNotFilled', String(ordersExecutedNotFilled.length));
+        logger.info(
+          `checkExecutedNotFilled ${String(ordersExecutedNotFilled.length)}`
+        );
       }
 
-      return await dataSources.ordersQueueAPI.executeOrders(ordersExecutedNotFilled);
-    },
-  },
+      return await dataSources.ordersQueueAPI.executeOrders(
+        ordersExecutedNotFilled
+      );
+    }
+  }
   // Mutation: {
   // }
 };
