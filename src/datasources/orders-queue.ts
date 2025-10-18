@@ -10,12 +10,20 @@ import {
 } from '../types';
 import logger from '../utilities/logger';
 
+interface DataSourceContext {
+  dataSources: {
+    marketsAPI: any;
+    ordersAPI: any;
+  };
+}
+
 class OrdersQueueAPI extends MongoDataSource<OrderQueue> {
+  context!: DataSourceContext;
   async getQueues(): Promise<OrderQueue[] | null> {
     const orders = await this.model.find();
 
     orders.map((order) => {
-      order.timestamp = order._id.getTimestamp();
+      order.timestamp = (order._id as any).getTimestamp();
       return order;
     });
 
@@ -26,7 +34,7 @@ class OrdersQueueAPI extends MongoDataSource<OrderQueue> {
     const order = await this.findOneById(id);
     const response = JSON.parse(JSON.stringify(order));
 
-    response.timestamp = order._id.getTimestamp();
+    response.timestamp = (order!._id as any).getTimestamp();
 
     return response;
   }
@@ -57,7 +65,7 @@ class OrdersQueueAPI extends MongoDataSource<OrderQueue> {
     if (Object.keys(updatedQueueOrder).length > 0) {
       return await this.collection.updateOne(
         {
-          _id: new ObjectId(id)
+          _id: new ObjectId(id) as any
         },
         {
           $set: updatedQueueOrder
