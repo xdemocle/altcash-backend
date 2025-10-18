@@ -1,5 +1,5 @@
 {
-  "name": "altcash-backend",
+  "name": "@altcash/backend",
   "description": "Backend server altcash",
   "version": "2.0.1",
   "author": "Rocco R. <im@rocco.me>",
