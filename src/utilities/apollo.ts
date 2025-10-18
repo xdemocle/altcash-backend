@@ -54,8 +54,8 @@ export const instanceServer = (httpServer: any) => {
       metadataAPI: new MetadataAPI(),
       namesAPI: new NamesAPI(),
       mybitxAPI: new MybitxAPI(),
-      ordersAPI: new OrdersAPI(OrderModel),
-      ordersQueueAPI: new OrdersQueueAPI(OrderQueueModel)
+      ordersAPI: new OrdersAPI({ modelOrCollection: OrderModel }) as any,
+      ordersQueueAPI: new OrdersQueueAPI({ modelOrCollection: OrderQueueModel }) as any
     }),
     // cache: new BaseRedisCache({
     //   client: new Redis(

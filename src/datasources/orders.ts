@@ -10,7 +10,7 @@ class OrdersAPI extends MongoDataSource<Order> {
     const orders = await this.model.find();
 
     orders.map((order) => {
-      order.timestamp = order._id.getTimestamp();
+      order.timestamp = (order._id as any).getTimestamp();
       return order;
     });
 
@@ -21,7 +21,7 @@ class OrdersAPI extends MongoDataSource<Order> {
     const order = await this.model.findById(id);
     const response = JSON.parse(JSON.stringify(order));
 
-    response.timestamp = order._id.getTimestamp();
+    response.timestamp = (order!._id as any).getTimestamp();
 
     return response;
   }
@@ -95,7 +95,7 @@ class OrdersAPI extends MongoDataSource<Order> {
     if (Object.keys(updatedOrder).length > 0) {
       await this.collection.updateOne(
         {
-          _id: new ObjectId(id)
+          _id: new ObjectId(id) as any
         },
         {
           $set: updatedOrder

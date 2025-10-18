@@ -171,7 +171,7 @@ class OrdersQueueAPI extends MongoDataSource<OrderQueue> {
         this.executeExchangeOrder(order);
 
         newOrdersQueue.push({
-          orderId: order._id,
+          orderId: String(order._id),
           isExecuted: false,
           isFilled: false
         });
